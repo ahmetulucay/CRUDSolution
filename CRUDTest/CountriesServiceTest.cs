@@ -2,7 +2,6 @@
 using ServiceContracts;
 using ServiceContracts.DTO;
 using Services;
-using Xunit;
 
 namespace CRUDTest;
 public class CountriesServiceTest
@@ -65,7 +64,6 @@ public class CountriesServiceTest
             _countriesService.AddCountry(request2);
         });
     }
-
 
     //When you supply proper country name, it should insert (add) the country
     //to the existing list of countries
