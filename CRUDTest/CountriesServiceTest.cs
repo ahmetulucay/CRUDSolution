@@ -10,7 +10,7 @@ public class CountriesServiceTest
 
     public CountriesServiceTest()
     {
-        _countriesService = new CountriesServices();
+        _countriesService = new CountriesService();
     }
 
     //When CountryAddRequest is null, it should throw ArgumentNullException
@@ -80,7 +80,7 @@ public class CountriesServiceTest
             CountryResponse response = _countriesService.AddCountry(request);
 
         //Assert
-        Assert.True(response.CountryId != Guid.Empty);
+        Assert.True(response.CountryID != Guid.Empty);
     }
 
 }
