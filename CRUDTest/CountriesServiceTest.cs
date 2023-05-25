@@ -76,13 +76,13 @@ public class CountriesServiceTest
         CountryAddRequest? request = new CountryAddRequest()
         {   CountryName = "Japan"  };
 
-        //Assert
-     
-            //Act
-            CountryResponse response = _countriesService.AddCountry(request);
+        //Act
+        CountryResponse response = _countriesService.AddCountry(request);
+        List<CountryResponse> countries_from_GetAllCountries = _countriesService.GetAllCountries();
 
         //Assert
         Assert.True(response.CountryID != Guid.Empty);
+        Assert.Contains(response, countries_from_GetAllCountries);
     }
     #endregion
 
@@ -119,6 +119,12 @@ public class CountriesServiceTest
         }
 
         List<CountryResponse> actualCountryResponseList = _countriesService.GetAllCountries();
+
+        //read each element from countries_list_from_add_country 
+        foreach (CountryResponse expected_country in countries_list_from_add_country)
+        {
+            Assert.Contains(expected_country, actualCountryResponseList);
+        }
     }
     #endregion
 
