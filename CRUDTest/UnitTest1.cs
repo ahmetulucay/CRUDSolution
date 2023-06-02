@@ -1,6 +1,6 @@
 using System.Runtime.Intrinsics.Arm;
 
-namespace CRUDTest;
+namespace CRUDTests;
 public class UnitTest1
 {
     [Fact]
