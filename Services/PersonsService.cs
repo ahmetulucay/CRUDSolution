@@ -6,7 +6,7 @@ using Entities;
 namespace Services;
 public class PersonsService : IPersonsService
 {
-    public PersonResponse AddPerson(PersonAddRequest personAddRequest)
+    public PersonResponse AddPerson(PersonAddRequest? personAddRequest)
     {
         throw new NotImplementedException();
     }
