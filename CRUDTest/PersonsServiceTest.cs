@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Xunit;
 using Entities;
 using Services;
+using Xunit.Abstractions;
 
 namespace CRUDTests;
 public class PersonsServiceTest
@@ -13,12 +14,14 @@ public class PersonsServiceTest
     //private fields
     private readonly IPersonsService _personService;
     private readonly ICountriesService _countriesService;
+    private readonly ITestOutputHelper _testOutputHelper;
 
     //constructor
-    public PersonsServiceTest()
+    public PersonsServiceTest(ITestOutputHelper testOutputHelper)
     {
         _personService = new PersonsService();
         _countriesService = new CountriesService();
+        _testOutputHelper = testOutputHelper;
     }
 
     #region AddPerson
@@ -245,8 +248,22 @@ public class PersonsServiceTest
             person_response_list_from_add.Add(person_response);
         }
 
+        //Print person_response_list_from_add
+        _testOutputHelper.WriteLine("Expected: ");
+        foreach (PersonResponse person_response_from_add in person_response_list_from_add)
+        {
+            _testOutputHelper.WriteLine(person_response_from_add.ToString());
+        }
+
         //Act
         List<PersonResponse> persons_list_from_get = _personService.GetAllPersons();
+
+        //Print person_list_from_get
+        _testOutputHelper.WriteLine("Actual: ");
+        foreach (PersonResponse person_response_from_get in persons_list_from_get)
+        {
+            _testOutputHelper.WriteLine(person_response_from_get.ToString());
+        }
 
         //Assert
         foreach (PersonResponse person_response_from_add in person_response_list_from_add)
