@@ -49,6 +49,5 @@ public interface IPersonsService
     /// should be sorted</param>
     /// <param name="sortOrder">ASC or DESC</param>
     /// <returns>Returns sorted persons as PersonResponse list</returns>
-    List<PersonResponse> GetSortedPersons(List<PersonResponse> allPersons, string sortBy, SortOrderOptions sortOrder);
-     
+    public List<PersonResponse> GetSortedPersons(List<PersonResponse> allPersons, string sortBy, SortOrderOptions sortOrder);
 }
