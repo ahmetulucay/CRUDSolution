@@ -2,6 +2,7 @@
 using System.Net;
 using System.Reflection;
 using Entities;
+using ServiceContracts.Enums;
 
 namespace ServiceContracts.DTO;
 
@@ -56,9 +57,22 @@ public class PersonResponse
             $"Date of Birth: {DateOfBirth?.ToString("dd MMM yyyy")}, Gender: {Gender}, " +
             $"Country ID: {CountryID}, Country :{Country}, Address: {Address}, " +
             $"Receive News Letters: {ReceiveNewsLetters}";
-
     }
 
+    public PersonUpdateRequest ToPersonUpdateRequest()
+    {
+        return new PersonUpdateRequest()
+        {
+            PersonID = PersonID,
+            PersonName = PersonName,
+            Email = Email,
+            DateOfBirth = DateOfBirth,
+            Gender = (GenderOptions)Enum.Parse(typeof(GenderOptions), Gender, true),
+            Address = Address,
+            CountryID = CountryID,
+            ReceiveNewsLetters = ReceiveNewsLetters
+        };
+    }
 }
 
 /// <summary>
