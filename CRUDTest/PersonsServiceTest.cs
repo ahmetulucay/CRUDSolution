@@ -603,8 +603,49 @@ public class PersonsServiceTest
         PersonUpdateRequest person_update_request = person_response_from_add.ToPersonUpdateRequest();
 
         person_update_request.PersonName = null;
+
+        //Assert
+        Assert.Throws<ArgumentException>(() =>
+        {   //Act
+            _personService.UpdatePerson(person_update_request);
+        });
     }
 
+
+    //First, add a new person and try to update the person name and email
+    [Fact]
+    public void UpdatePerson_PersonFullDetailsUpdation()
+    {
+        //Arrange
+        CountryAddRequest country_add_request = new CountryAddRequest()
+        { CountryName = "UK" };
+        CountryResponse country_response_from_add = _countriesService.AddCountry(country_add_request);
+
+        PersonAddRequest person_add_request = new PersonAddRequest()
+        {
+            PersonName = "John",
+            CountryID = country_response_from_add.CountryID, Address = "PersonUpdate Str.",
+            DateOfBirth = DateTime.Parse("2002-02-03"), Email = "PersonAddRequest@gmail.com",
+            Gender = GenderOptions.Male, ReceiveNewsLetters = true
+        };
+
+        PersonResponse person_response_from_add = _personService.AddPerson(person_add_request);
+
+        PersonUpdateRequest person_update_request = person_response_from_add.ToPersonUpdateRequest();
+
+        person_update_request.PersonName = "William";
+        person_update_request.Email = "william@gmail.com";
+
+        //Act
+        PersonResponse person_response_from_update = 
+            _personService.UpdatePerson(person_update_request);
+
+        PersonResponse? person_response_from_get = 
+            _personService.GetPersonByPersonID(person_response_from_update.PersonID);
+
+        //Assert
+        Assert.Equal(person_response_from_get, person_response_from_update);
+    }
 
     #endregion
 }
