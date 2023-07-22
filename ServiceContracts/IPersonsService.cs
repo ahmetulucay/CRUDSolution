@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic.FileIO;
 
 namespace ServiceContracts;
 
@@ -58,4 +59,11 @@ public interface IPersonsService
     /// <param name="personUpdateRequest">Person details to update, including person id</param>
     /// <returns>Returns the person response object after updation</returns>
     PersonResponse UpdatePerson(PersonUpdateRequest? personUpdateRequest);
+
+    /// <summary>
+    /// Deletes a person based on the given person id
+    /// </summary>
+    /// <param name="personID">PersonID to delete</param>
+    /// <returns>Returns true, if the deletion is successful; otherwise false</returns>
+    bool DeletePerson(Guid? personID);
 }
