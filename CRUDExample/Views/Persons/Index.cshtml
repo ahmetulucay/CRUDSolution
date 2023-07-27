@@ -42,7 +42,8 @@
 
         <thead>
             <tr>
-                <th>Person Name</th>
+                <th><a href="~/persons/index?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&
+sortBy=@nameof(PersonResponse.PersonName)&sortOrder=DESC">Person Name</a></th>
                 <th>Email</th>
                 <th>Date of Birth</th>
                 <th>Age</th>
