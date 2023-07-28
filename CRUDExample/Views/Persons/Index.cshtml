@@ -42,8 +42,29 @@
 
         <thead>
             <tr>
-                <th><a href="~/persons/index?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&
-sortBy=@nameof(PersonResponse.PersonName)&sortOrder=DESC">Person Name</a></th>
+                @if (ViewBag.CurrentSortBy == nameof(PersonResponse.PersonName) &&
+                ViewBag.CurrentSortOrder == SortOrderOptions.ASC.ToString())
+                {
+                    <th><a href="~/persons/index?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&
+sortBy=@nameof(PersonResponse.PersonName)&sortOrder=@nameof(SortOrderOptions.DESC)">Person Name</a></th>
+                <i class="fa-solid" fa-sort-up></i>
+                }
+                else if (ViewBag.CurrentSortBy == nameof(PersonResponse.PersonName) &&
+                ViewBag.CurrentSortOrder == SortOrderOptions.DESC.ToString())
+                {
+                    <th><a href="~/persons/index?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&
+sortBy=@nameof(PersonResponse.PersonName)&sortOrder=@nameof(SortOrderOptions.ASC)">Person Name</a></th>
+                <i class="fa-solid" fa-sort-down></i>
+
+                }
+                else
+                {
+                    <th>
+                        <a href="~/persons/index?searchBy=@ViewBag.CurrentSearchBy&searchString=@ViewBag.CurrentSearchString&
+sortBy=@nameof(PersonResponse.PersonName)&sortOrder=@nameof(SortOrderOptions.ASC)">Person Name</a>
+                    </th>
+                }
+
                 <th>Email</th>
                 <th>Date of Birth</th>
                 <th>Age</th>
