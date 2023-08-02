@@ -134,7 +134,7 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
 
     public List<PersonResponse> GetAllPersons()
     {
-        return _persons.Select(temp => temp.ToPersonResponse()).ToList();
+        return _persons.Select(temp => ConvertPersontToPersonResponse(temp)).ToList();
     }
 
     public PersonResponse? GetPersonByPersonID(Guid? personID)
@@ -147,7 +147,7 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
         if(person == null)
             return null;
 
-        return person.ToPersonResponse();
+        return ConvertPersontToPersonResponse(person);
     }
 
     public List<PersonResponse> GetFilteredPersons(string searchBy, string? searchString)
@@ -306,7 +306,7 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
         matchingPerson.Address = personUpdateRequest.Address;
         matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
-        return matchingPerson.ToPersonResponse();
+        return ConvertPersontToPersonResponse(matchingPerson);
     }
 
     public bool DeletePerson(Guid? personID)
