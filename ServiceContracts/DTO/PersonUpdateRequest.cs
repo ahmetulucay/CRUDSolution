@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using Entities;
 using ServiceContracts.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ServiceContracts.DTO;
 
 /// <summary>
-/// Acts as a DTO for inserting a new person
+/// Represents the DTO class that contains the person details to update
 /// </summary>
-public class PersonAddRequest
+public class PersonUpdateRequest
 {
+    [Required(ErrorMessage = "Person Id can't be blank")]
+    public Guid PersonID { get; set; }
+
     [Required(ErrorMessage = "Person Name can't be blank")]
     public string? PersonName { get; set; }
     [Required(ErrorMessage = "Email can't be blank")]
@@ -29,11 +27,12 @@ public class PersonAddRequest
     /// Converts the current object of PersonAddRequest
     /// into a new object of Person type
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Returns Person objects</returns>
     public Person ToPerson()
     {
         return new Person()
         {
+            PersonID = PersonID,
             PersonName = PersonName,
             Email = Email,
             DateOfBirth = DateOfBirth,
