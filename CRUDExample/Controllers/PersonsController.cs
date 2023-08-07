@@ -5,6 +5,7 @@ using ServiceContracts.Enums;
 
 namespace CRUDExample.Controllers
 {
+    [Route("[controller]")]
     public class PersonsController : Controller
     {
         //private fields
@@ -18,7 +19,8 @@ namespace CRUDExample.Controllers
             _countriesService = countriesService;
         }
 
-        [Route("persons/index")]
+        //Url: persons/index
+        [Route("[action]")]
         [Route("/")]
         public IActionResult Index(string searchBy, string? searchString, string sortBy =
             nameof(PersonResponse.PersonName), SortOrderOptions sortOrder = SortOrderOptions.ASC)
@@ -48,13 +50,36 @@ namespace CRUDExample.Controllers
 
         //Executes when the user clicks on "Create Person" hyperlink
         //(while opening the create view)
-        [Route("persons/create")]
+        //Url: persons/create
+        [Route("[action]")]
         [HttpGet]
         public IActionResult Create()
         {
             List<CountryResponse> countries = _countriesService.GetAllCountries();
             ViewBag.Countries = countries;
             return View();
+        }
+
+        //Url: persons/create
+        [Route("[action]")]
+        [HttpPost]
+        public IActionResult Create(PersonAddRequest personAddRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                List<CountryResponse> countries = _countriesService.GetAllCountries();
+                ViewBag.Countries = countries;
+                ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e=>
+                e.ErrorMessage).ToList();
+                return View();
+            }
+
+            //call the service method
+            PersonResponse personResponse = _personsService.AddPerson(personAddRequest);
+
+            //navigate to Index() action method (it makes another get request to
+            //"persons/index"
+            return RedirectToAction("Index", "Persons");
         }
     }
 }
