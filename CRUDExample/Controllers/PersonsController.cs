@@ -86,5 +86,12 @@ namespace CRUDExample.Controllers
             //"persons/index"
             return RedirectToAction("Index", "Persons");
         }
+
+        [HttpGet]
+        [Route("[action]/{personID}")] //Eg:  /persons/edit/1
+        public IActionResult Edit(Guid personID)
+        {
+            return View();
+        }
     }
 }
