@@ -8,7 +8,9 @@
 <h2>Edit Person</h2>
 
 <div class="center-box">
-    <form asp-controller="Persons" asp-action="Create" method="post">
+    <form asp-controller="Persons" asp-action="Edit" method="post">
+
+        <input type="hidden" asp-for="PersonID" />
         @*Person Name*@
         <div class="form-field flex">
             <div class="w-25">
