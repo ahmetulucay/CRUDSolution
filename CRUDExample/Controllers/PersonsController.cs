@@ -141,7 +141,7 @@ namespace CRUDExample.Controllers
 
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e =>
                 e.ErrorMessage).ToList();
-                return View();
+                return View(personResponse.ToPersonUpdateRequest());
             }
         }
 
@@ -158,6 +158,17 @@ namespace CRUDExample.Controllers
             return View(personResponse);
         }
 
+        [HttpPost]
+        [Route("[action]/{personID}")]
+        public IActionResult Delete (PersonUpdateRequest personUpdateResult)
+        {
+            PersonResponse? personResponse = _personsService.GetPersonByPersonID(personUpdateResult.PersonID);
 
+            if (personResponse == null)
+                return RedirectToAction("Index");
+
+            _personsService.DeletePerson(personUpdateResult.PersonID);
+            return RedirectToAction("Index");
+        }
     }
 }
