@@ -21,8 +21,11 @@ public class PersonAddRequest
     [DataType(DataType.EmailAddress)]
     public string? Email { get; set; }
     [DataType(DataType.Date)]
+    [Required(ErrorMessage ="Please select the Date of Birth")]
     public DateTime? DateOfBirth { get; set; }
+    [Required(ErrorMessage ="Please select gender of the person")]
     public GenderOptions? Gender { get; set; }
+    [Required(ErrorMessage ="Please select a country")]
     public Guid? CountryID { get; set; }
     public string? Address { get; set; }
     public bool ReceiveNewsLetters { get; set; }
