@@ -17,6 +17,14 @@ builder.Services.AddDbContext<PersonsDbContext>(options =>
     options.UseSqlServer();
 });
 
+//Data Source=(localdb)\MSSQLLocalDB;
+//Initial Catalog=PersonsDatabase;
+//Integrated Security=True;
+//Connect Timeout=30;Encrypt=False;
+//Trust Server Certificate=False;
+//Application Intent=ReadWrite;
+//Multi Subnet Failover=False
+
 var app = builder.Build();
 
 if (builder.Environment.IsDevelopment())
