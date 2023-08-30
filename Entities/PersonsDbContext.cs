@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,10 @@ using System.Threading.Tasks;
 namespace Entities;
 public class PersonsDbContext : DbContext
 {
+    public PersonsDbContext(DbContextOptions options) : base(options)
+    {
+    }
+
     public DbSet<Country> Countries { get; set;}
 
     public DbSet<Person> Persons { get; set;}
@@ -35,7 +40,7 @@ public class PersonsDbContext : DbContext
 
         foreach (Person person in persons)
         {
-            modelBuilder.Entity<Country>().HasData(person);
+            modelBuilder.Entity<Person>().HasData(person);
         }
     }
 }
