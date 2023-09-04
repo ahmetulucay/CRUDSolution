@@ -50,12 +50,12 @@ public class PersonsService : IPersonsService
 
         //convert the Person object into PersonResponse type
         return ConvertPersontToPersonResponse(person);
-
     }
 
     public List<PersonResponse> GetAllPersons()
     {
-        return _db.Persons.Select(temp => ConvertPersontToPersonResponse(temp)).ToList();
+        //SELECT * FROM PERSONS
+        return _db.Persons.ToList().Select(temp => ConvertPersontToPersonResponse(temp)).ToList();
     }
 
     public PersonResponse? GetPersonByPersonID(Guid? personID)
@@ -126,7 +126,6 @@ public class PersonsService : IPersonsService
             default: matchingPersons = allPersons;
                 break;
         }
-
         return matchingPersons;
     }
 
@@ -199,7 +198,6 @@ public class PersonsService : IPersonsService
             _ => allPersons
 
         };
-
         return sortedPersons;
     }
 
