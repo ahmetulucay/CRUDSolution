@@ -20,7 +20,11 @@ public class PersonsService : IPersonsService
         _countriesService = countriesService;
     }
 
-        private PersonResponse ConvertPersontToPersonResponse(Person person)
+    public PersonsService()
+    {
+    }
+
+    private PersonResponse ConvertPersontToPersonResponse(Person person)
     {
         PersonResponse personResponse = person.ToPersonResponse();
         personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName;
