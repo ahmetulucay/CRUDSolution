@@ -24,7 +24,7 @@ public class PersonsService : IPersonsService
     {
     }
 
-    private PersonResponse ConvertPersontToPersonResponse(Person person)
+    private PersonResponse ConvertPersonToPersonResponse(Person person)
     {
         PersonResponse personResponse = person.ToPersonResponse();
         personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName;
@@ -49,18 +49,19 @@ public class PersonsService : IPersonsService
         person.PersonID = Guid.NewGuid();
 
         //add person object to persons list
-        _db.Persons.Add(person);
-        _db.SaveChanges();
+        //_db.Persons.Add(person);
+        //_db.SaveChanges();
+        _db.sp_InsertPerson(person);
 
         //convert the Person object into PersonResponse type
-        return ConvertPersontToPersonResponse(person);
+        return ConvertPersonToPersonResponse(person);
     }
 
     public List<PersonResponse> GetAllPersons()
     {
         //SELECT * FROM PERSONS
         //return _db.Persons.ToList().Select(temp => ConvertPersontToPersonResponse(temp)).ToList();
-        return _db.sp_GetAllPersons().Select(temp => ConvertPersontToPersonResponse(temp)).ToList();
+        return _db.sp_GetAllPersons().Select(temp => ConvertPersonToPersonResponse(temp)).ToList();
     }
 
     public PersonResponse? GetPersonByPersonID(Guid? personID)
@@ -73,7 +74,7 @@ public class PersonsService : IPersonsService
         if(person == null)
             return null;
 
-        return ConvertPersontToPersonResponse(person);
+        return ConvertPersonToPersonResponse(person);
     }
 
     public List<PersonResponse> GetFilteredPersons(string searchBy, string? searchString)
@@ -232,7 +233,7 @@ public class PersonsService : IPersonsService
 
         _db.SaveChanges(); //UPDATE
 
-        return ConvertPersontToPersonResponse(matchingPerson);
+        return ConvertPersonToPersonResponse(matchingPerson);
     }
 
     public bool DeletePerson(Guid? personID)
