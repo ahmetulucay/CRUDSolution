@@ -10,97 +10,21 @@ public class PersonsService : IPersonsService
 {
 
     //private field
-    private readonly List<Person> _persons;
+    private readonly PersonsDbContext _db;
     private readonly ICountriesService _countriesService;
 
     //constructor
-    public PersonsService(bool initialize = true)
+    public PersonsService(PersonsDbContext personsDbContext, ICountriesService countriesService)
     {
-        _persons = new List<Person>();
-        _countriesService = new CountriesService();
-
-        if (initialize)
-        {
-            _persons.Add(new Person()
-            { PersonID = Guid.Parse("BF0DFD8F-EDE8-4D27-846D-6A2FA0414FAB"),
-                PersonName = "Jorey", 
-                Email = "jnore0@google.com",
-                DateOfBirth = DateTime.Parse("2004-06-06"),
-                Gender = "Female",
-                Address = "0913 Eggendart Lane",
-                ReceiveNewsLetters = false,
-                CountryID = Guid.Parse("A308DFE4-479D-42E0-8506-5ED01B8F1C62")
-            });
-
-            _persons.Add(new Person()
-            {
-                PersonID = Guid.Parse("6402182C-55A1-47B0-A12B-A2F11E595A27"),
-                PersonName = "Jenda",
-                Email = "jmccahey1@plala.or.jp",
-                DateOfBirth = DateTime.Parse("1995-11-21"),
-                Gender = "Female",
-                Address = "0064 Monument Park",
-                ReceiveNewsLetters = true,
-                CountryID = Guid.Parse("828EDC8D-438C-4C8A-A03F-3368F8C4EA19")
-            });
-
-            _persons.Add(new Person()
-            {
-                PersonID = Guid.Parse("43F26DF8-2F58-4D81-B4FB-0133EA6A2219"),
-                PersonName = "Hewitt",
-                Email = "hzecchetti2@omniture.com",
-                DateOfBirth = DateTime.Parse("2004-06-23"),
-                Gender = "Male",
-                Address = "172 Badeau Street",
-                ReceiveNewsLetters = true,
-                CountryID = Guid.Parse("41E6C698-100B-45E6-8F21-831E106AAAE3")
-            });
-
-            _persons.Add(new Person()
-            {
-                PersonID = Guid.Parse("0C77CCF3-58BA-4909-B263-C3067AB3564B"),
-                PersonName = "Lotta",
-                Email = "lwinkworth3@hhs.gov",
-                DateOfBirth = DateTime.Parse("2008-08-02"),
-                Gender = "Female",
-                Address = "350 Evergreen Junction",
-                ReceiveNewsLetters = true,
-                CountryID = Guid.Parse("7CCF8F21-4757-415A-B696-94A8465A6D65")
-            });
-
-            _persons.Add(new Person()
-            {
-                PersonID = Guid.Parse("AB642EBB-0D06-4A01-9E99-6EF8BB8116A6"),
-                PersonName = "Dolly",
-                Email = "dhierro4@hatena.ne.jp",
-                DateOfBirth = DateTime.Parse("2009-07-12"),
-                Gender = "Female",
-                Address = "458 Kings Pass",
-                ReceiveNewsLetters = true,
-                CountryID = Guid.Parse("06E1FDA9-68B4-4688-AEB3-5BBC33FAA559")
-            });
-
-            _persons.Add(new Person()
-            {
-                PersonID = Guid.Parse("AEA39288-27D8-4D88-9FC8-9D8038C89157"),
-                PersonName = "Adlai",
-                Email = "akeesman5@slashdot.org",
-                DateOfBirth = DateTime.Parse("1997-07-27"),
-                Gender = "Male",
-                Address = "66 Anthes Crossing",
-                ReceiveNewsLetters = false,
-                CountryID = Guid.Parse("44E78C26-8B7D-4207-9980-3F7740D9C03E")
-            });
-            /*
-Kikelia,kpocklington6@themeforest.net,1990-11-18,Female,548 7th Circle,true
-Blaine,bbanes7@pagesperso-orange.fr,2001-05-09,Male,75881 Tennessee Alley,true
-Hunt,hgouth8@fema.gov,1997-12-19,Male,0217 Hudson Drive,false
-Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
-             */
-        }
+        _db = personsDbContext;
+        _countriesService = countriesService;
     }
 
-        private PersonResponse ConvertPersontToPersonResponse(Person person)
+    public PersonsService()
+    {
+    }
+
+    private PersonResponse ConvertPersonToPersonResponse(Person person)
     {
         PersonResponse personResponse = person.ToPersonResponse();
         personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName;
@@ -125,16 +49,19 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
         person.PersonID = Guid.NewGuid();
 
         //add person object to persons list
-        _persons.Add(person);
+        _db.Persons.Add(person);
+        _db.SaveChanges();
+        //_db.sp_InsertPerson(person);
 
         //convert the Person object into PersonResponse type
-        return ConvertPersontToPersonResponse(person);
-
+        return ConvertPersonToPersonResponse(person);
     }
 
     public List<PersonResponse> GetAllPersons()
     {
-        return _persons.Select(temp => ConvertPersontToPersonResponse(temp)).ToList();
+        //SELECT * FROM PERSONS
+        return _db.Persons.ToList().Select(temp => ConvertPersonToPersonResponse(temp)).ToList();
+        //return _db.sp_GetAllPersons().Select(temp => ConvertPersonToPersonResponse(temp)).ToList();
     }
 
     public PersonResponse? GetPersonByPersonID(Guid? personID)
@@ -142,12 +69,12 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
         if (personID == null)
             return null;
 
-        Person? person = _persons.FirstOrDefault(p => p.PersonID == personID);
+        Person? person = _db.Persons.FirstOrDefault(p => p.PersonID == personID);
 
         if(person == null)
             return null;
 
-        return ConvertPersontToPersonResponse(person);
+        return ConvertPersonToPersonResponse(person);
     }
 
     public List<PersonResponse> GetFilteredPersons(string searchBy, string? searchString)
@@ -205,7 +132,6 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
             default: matchingPersons = allPersons;
                 break;
         }
-
         return matchingPersons;
     }
 
@@ -278,7 +204,6 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
             _ => allPersons
 
         };
-
         return sortedPersons;
     }
 
@@ -291,7 +216,7 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
         ValidationHelper.ModelValidation(personUpdateRequest);
 
         //get matching person object to update
-        Person? matchingPerson = _persons.FirstOrDefault(temp => temp.PersonID == personUpdateRequest.PersonID);
+        Person? matchingPerson = _db.Persons.FirstOrDefault(temp => temp.PersonID == personUpdateRequest.PersonID);
         if (matchingPerson == null)
         {
             throw new ArgumentException("Given person id doesn't exist");
@@ -306,7 +231,9 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
         matchingPerson.Address = personUpdateRequest.Address;
         matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
-        return ConvertPersontToPersonResponse(matchingPerson);
+        _db.SaveChanges(); //UPDATE
+
+        return ConvertPersonToPersonResponse(matchingPerson);
     }
 
     public bool DeletePerson(Guid? personID)
@@ -316,12 +243,13 @@ Alexandr,await9@zimbio.com,2009-12-27,Male,3 La Follette Drive,false
             throw new ArgumentNullException(nameof(personID));
         }
 
-        Person? person = _persons.FirstOrDefault(temp => temp.PersonID == personID);
+        Person? person = _db.Persons.FirstOrDefault(temp => temp.PersonID == personID);
 
         if (person == null)
             return false;
 
-        _persons.RemoveAll(temp => temp.PersonID == personID);
+        _db.Persons.Remove(_db.Persons.First(temp => temp.PersonID == personID));
+        _db.SaveChanges();
 
         return true;
     }
