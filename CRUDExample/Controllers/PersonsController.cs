@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Rotativa.AspNetCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
@@ -169,6 +170,15 @@ namespace CRUDExample.Controllers
 
             await _personsService.DeletePerson(personUpdateResult.PersonID);
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> PersonPDF()
+        {
+            //Getlist of persons
+            List<PersonResponse> personResponses = await _personsService.GetAllPersons();
+
+            //return view as pdf
+            return new ViewAsPdf();
         }
     }
 }
