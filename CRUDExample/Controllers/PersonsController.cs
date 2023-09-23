@@ -171,14 +171,21 @@ namespace CRUDExample.Controllers
             await _personsService.DeletePerson(personUpdateResult.PersonID);
             return RedirectToAction("Index");
         }
-
-        public async Task<IActionResult> PersonPDF()
+        [Route("PersonsPDF")]
+        public async Task<IActionResult> PersonsPDF()
         {
             //Getlist of persons
-            List<PersonResponse> personResponses = await _personsService.GetAllPersons();
+            List<PersonResponse> persons = await _personsService.GetAllPersons();
 
             //return view as pdf
-            return new ViewAsPdf();
+            return new ViewAsPdf("PersonsPDF", persons, ViewData)
+            {
+                PageMargins = new Rotativa.AspNetCore.Options.Margins()
+                {
+                    Top = 20, Bottom = 20, Right = 20, Left = 20
+                },
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape
+            };
         }
     }
 }
