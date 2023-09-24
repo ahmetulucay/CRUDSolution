@@ -4,6 +4,7 @@ using Rotativa.AspNetCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
+using System.IO;
 
 namespace CRUDExample.Controllers
 {
@@ -186,6 +187,13 @@ namespace CRUDExample.Controllers
                 },
                 PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape
             };
+        }
+
+        [Route("PersonsCSV")]
+        public async Task<IActionResult> PersonsCSV()
+        {
+            MemoryStream stream = await _personsService.GetPersonsCSV();
+            return File(stream, "application/octet-stream", "personscsv.csv");
         }
     }
 }

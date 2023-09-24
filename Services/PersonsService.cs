@@ -5,6 +5,9 @@ using Entities;
 using Services.Helpers;
 using ServiceContracts.Enums;
 using Microsoft.EntityFrameworkCore;
+using CsvHelper;
+using System.Globalization;
+using System.IO;
 
 namespace Services;
 public class PersonsService : IPersonsService
@@ -254,5 +257,23 @@ public class PersonsService : IPersonsService
         await _db.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<MemoryStream> GetPersonsCSV()
+    {
+        MemoryStream memoryStream = new MemoryStream();
+        StreamWriter writer = new StreamWriter(memoryStream);
+        CsvWriter csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
+
+        csvWriter.WriteHeader<PersonResponse>(); // PersonID, ...
+        csvWriter.NextRecord();
+
+        List<PersonResponse> persons = _db.Persons
+            .Include("Country")
+            .Select(tmp => tmp.ToPersonResponse()).ToList();
+        await csvWriter.WriteRecordsAsync(persons);
+
+        memoryStream.Position = 0;
+        return memoryStream;
     }
 }
