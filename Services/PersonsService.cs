@@ -305,16 +305,57 @@ public class PersonsService : IPersonsService
         return memoryStream;
     }
 
-    public Task<MemoryStream> GetPersonsExcel()
+    public async Task<MemoryStream> GetPersonsExcel()
     {
         MemoryStream memoryStream = new MemoryStream();
-        using (ExcelPackage excelPage = new ExcelPackage())
+        using (ExcelPackage excelPage = new ExcelPackage(memoryStream))
         {
             ExcelWorksheet excelWorksheet = excelPage.Workbook.Worksheets.
                 Add("PersonsSheet");
+            excelWorksheet.Cells["A1"].Value = "Person Name";
+            excelWorksheet.Cells["B1"].Value = "Email";
+            excelWorksheet.Cells["C1"].Value = "Date of Birth";
+            excelWorksheet.Cells["D1"].Value = "Age";
+            excelWorksheet.Cells["E1"].Value = "Gender";
+            excelWorksheet.Cells["F1"].Value = "Country";
+            excelWorksheet.Cells["G1"].Value = "Address";
+            excelWorksheet.Cells["H1"].Value = "Receive News Letters";
+
+            using (ExcelRange headerCells = excelWorksheet.Cells["A1:H1"] )
+            {
+                headerCells.Style.Fill.PatternType =
+                    OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                headerCells.Style.Fill.BackgroundColor.SetColor(
+                    System.Drawing.Color.LightGray);
+                headerCells.Style.Font.Bold = true;
+            }
+
+            int row = 2;
+            List<PersonResponse> persons = _db.Persons.Include("Country").Select(
+                temp => temp.ToPersonResponse()).ToList();
+            foreach (PersonResponse person in persons)
+            {
+                excelWorksheet.Cells[row, 1].Value = person.PersonName;
+                excelWorksheet.Cells[row, 2].Value = person.Email;
+                if (person.DateOfBirth.HasValue)
+                    excelWorksheet.Cells[row, 3].Value = 
+                        person.DateOfBirth.Value.ToString("yyyy-MM-dd");
+                excelWorksheet.Cells[row, 4].Value = person.Age;
+                excelWorksheet.Cells[row, 5].Value = person.Gender;
+                excelWorksheet.Cells[row, 6].Value = person.Country;
+                excelWorksheet.Cells[row, 7].Value = person.Address;
+                excelWorksheet.Cells[row, 8].Value = person.ReceiveNewsLetters;
+
+                row++;
+            }
+
+            excelWorksheet.Cells[$"A1:H{row}"].AutoFitColumns();
+
+            await excelPage.SaveAsync();
         }
 
-        return null; // will be changed later...
+        memoryStream.Position = 0;
 
+        return memoryStream;
     }
 }
