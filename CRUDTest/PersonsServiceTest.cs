@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using EntityFrameworkCoreMock;
+using AutoFixture;
 
 namespace CRUDTests;
 public class PersonsServiceTest
@@ -15,10 +16,12 @@ public class PersonsServiceTest
     private readonly IPersonsService _personService;
     private readonly ICountriesService _countriesService;
     private readonly ITestOutputHelper _testOutputHelper;
+    private readonly IFixture _fixture;
 
     //constructor
     public PersonsServiceTest(ITestOutputHelper testOutputHelper)
     {
+        _fixture = new Fixture();
         var countriesInitialData = new List<Country>() { };
         var personsInitialData = new List<Person>() { };
 
@@ -119,12 +122,10 @@ public class PersonsServiceTest
     public async Task AddPerson_ProperPersonDetails()
     {
         //Arrange
-        PersonAddRequest? personAddRequest = new PersonAddRequest()
-        {
-            PersonName = "Person name:..", Email = "personNull@gmail.com", Address ="Address null",
-            CountryID = Guid.NewGuid(), Gender = GenderOptions.Male, DateOfBirth = DateTime.Parse
-            ("2020-02-03"), ReceiveNewsLetters = true
-        };
+        PersonAddRequest? personAddRequest = 
+            _fixture.Build<PersonAddRequest>()
+            .With(temp =>  temp.Email, "somebody@example.com")
+            .Create();
 
         //Act
         PersonResponse person_response_from_add = await _personService.AddPerson(personAddRequest);
@@ -604,11 +605,11 @@ public class PersonsServiceTest
     public async Task UpdatePerson_PersonNameIsNull()
     {
         //Arrange
-        CountryAddRequest country_add_request = new CountryAddRequest()
-        {CountryName = "UK"};
+        CountryAddRequest country_add_request = new CountryAddRequest(){CountryName = "UK"};
+
         CountryResponse country_response_from_add = await _countriesService.AddCountry(country_add_request);
 
-        PersonAddRequest person_add_request = new PersonAddRequest()
+        PersonAddRequest person_add_request = new()
         {
             PersonName = "John", CountryID = country_response_from_add.CountryID,
             Email = "john@example.com", Address = "my address...",
