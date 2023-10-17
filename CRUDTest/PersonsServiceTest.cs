@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using EntityFrameworkCoreMock;
 using AutoFixture;
+using FluentAssertions;
 
 namespace CRUDTests;
 public class PersonsServiceTest
@@ -50,10 +51,12 @@ public class PersonsServiceTest
         PersonAddRequest? personAddRequest = null;
 
         //Act
-        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+        Func<Task> action = async () =>
         {
             await _personService.AddPerson(personAddRequest);
-        });
+        };
+
+        await action.Should().ThrowAsync<ArgumentNullException>();
     }
 
 
