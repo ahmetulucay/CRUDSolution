@@ -72,11 +72,13 @@ public class PersonsServiceTest
             .Create();
 
         //Assert
-        await Assert.ThrowsAsync<ArgumentException>(async () =>
+        Func<Task> action = async () =>
         {
             //Act
             await _personService.AddPerson(personAddRequest);
-        });
+        };
+
+        await action.Should().ThrowAsync<ArgumentNullException>();
     }
 
     //When we supply proper person details, it should insert the person into the persons list;
@@ -97,9 +99,12 @@ public class PersonsServiceTest
         List<PersonResponse> persons_list = await _personService.GetAllPersons();
 
         //Assert
-        Assert.True(person_response_from_add.PersonID != Guid.Empty);
+        //Assert.True(person_response_from_add.PersonID != Guid.Empty);
 
-        Assert.Contains(person_response_from_add, persons_list);
+        person_response_from_add.Should().NotBe(Guid.Empty) ;
+
+        //Assert.Contains(person_response_from_add, persons_list);
+        persons_list.Should().Contain(person_response_from_add);
     }
 
     //When we supply null value as Email, it ahould throw ArgumentException
@@ -151,10 +156,12 @@ public class PersonsServiceTest
         Guid? personID = null;
 
         //Act
-        PersonResponse? person_response_from_get = await _personService.GetPersonByPersonID(personID);
+        PersonResponse? person_response_from_get = await 
+            _personService.GetPersonByPersonID(personID);
 
         //Assert
-        Assert.Null(person_response_from_get);
+        //Assert.Null(person_response_from_get);
+        person_response_from_get.Should().BeNull();
     }
 
     //if we supply a valid person id, it should return the valid
@@ -179,7 +186,9 @@ public class PersonsServiceTest
         PersonResponse? person_response_from_get = await _personService.GetPersonByPersonID(person_response_from_add.PersonID);
 
         //Assert
-        Assert.Equal(person_response_from_add, person_response_from_get);
+        person_response_from_get.Should().Be(person_response_from_add);
+
+
     }
     #endregion
 
@@ -193,7 +202,7 @@ public class PersonsServiceTest
         List<PersonResponse> persons_from_get = await _personService.GetAllPersons();
 
         //Assert
-        Assert.Empty(persons_from_get);
+        persons_from_get.Should().BeEmpty(); 
     }
 
     //First, we will add few persons; and then when we call GetAllPersons(),
@@ -258,10 +267,7 @@ public class PersonsServiceTest
         }
 
         //Assert
-        foreach (PersonResponse person_response_from_add in person_response_list_from_add)
-        {
-            Assert.Contains(person_response_from_add, persons_list_from_get);
-        }
+        persons_list_from_get.Should().BeEquivalentTo(person_response_list_from_add);
     }
 
     #endregion
