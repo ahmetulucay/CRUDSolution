@@ -337,10 +337,7 @@ public class PersonsServiceTest
         }
 
         //Assert
-        foreach (PersonResponse person_response_from_add in person_response_list_from_add)
-        {
-            Assert.Contains(person_response_from_add, persons_list_from_search);
-        }
+        persons_list_from_search.Should().BeEquivalentTo(person_response_list_from_add);
     }
 
     //First we will add few persons; and then we will search based on person name with some
@@ -412,17 +409,10 @@ public class PersonsServiceTest
         }
 
         //Assert
-        foreach (PersonResponse person_response_from_add in person_response_list_from_add)
-        {
-            if (person_response_from_add.PersonName != null)
-            {
-                if (person_response_from_add.PersonName.Contains("nica",
-                StringComparison.OrdinalIgnoreCase))
-                {
-                    Assert.Contains(person_response_from_add, persons_list_from_search);
-                }
-            }
-        }
+        persons_list_from_search.Should().OnlyContain(temp => 
+        temp.PersonName.Contains("nica", 
+        StringComparison.OrdinalIgnoreCase));
+
     }
 
     #endregion
@@ -498,15 +488,14 @@ public class PersonsServiceTest
             _testOutputHelper.WriteLine(person_response_from_get.ToString());
         }
 
-        person_response_list_from_add = person_response_list_from_add.OrderByDescending(temp => 
-        temp.PersonName).ToList();
+        //person_response_list_from_add = person_response_list_from_add.OrderByDescending(temp => temp.PersonName).ToList();
 
         //Assert
+        //persons_list_from_sort.Should().BeEquivalentTo(person_response_list_from_add);
 
-        for (int i = 0; i< person_response_list_from_add.Count; i++)
-        {
-            Assert.Equal(person_response_list_from_add[i], persons_list_from_sort[i]);
-        }
+        persons_list_from_sort.Should().BeInDescendingOrder(temp =>
+        temp.PersonName);
+
     }
     #endregion
 
