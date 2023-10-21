@@ -78,7 +78,7 @@ public class PersonsServiceTest
             await _personService.AddPerson(personAddRequest);
         };
 
-        await action.Should().ThrowAsync<ArgumentNullException>();
+        await action.Should().ThrowAsync<ArgumentException>();
     }
 
     //When we supply proper person details, it should insert the person into the persons list;
@@ -510,12 +510,14 @@ public class PersonsServiceTest
         //Arrange
         PersonUpdateRequest? person_update_request = null;
 
-        //Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(async() =>
+        //Act
+        Func<Task> action = async () =>
         {
-            //Act
             await _personService.UpdatePerson(person_update_request);
-        });        
+        };        
+
+        //Assert
+        await action.Should().ThrowAsync<ArgumentNullException>();
     }
 
     //When we supply invalid person id, it should throw ArgumentException
@@ -528,12 +530,14 @@ public class PersonsServiceTest
             _fixture.Build<PersonUpdateRequest>()
             .Create();
 
-        //Assert
-        await Assert.ThrowsAsync<ArgumentException>(async() =>
+        //Act
+        Func<Task> action = async() =>
         {
-            //Act
             await _personService.UpdatePerson(person_update_request);
-        });
+        };
+
+        //Assert
+        await action.Should().ThrowAsync<ArgumentException>();
     }
 
     //When the PersonName is null, it should throw ArgumentException
@@ -562,11 +566,15 @@ public class PersonsServiceTest
 
         person_update_request.PersonName = null;
 
-        //Assert
-        await Assert.ThrowsAsync<ArgumentException>(async () =>
-        {   //Act
+        //Act
+        var action = async () =>
+        {
             await _personService.UpdatePerson(person_update_request);
-        });
+        };
+
+        //Assert
+
+        await action.Should().ThrowAsync<ArgumentException>();
     }
 
 
@@ -603,7 +611,7 @@ public class PersonsServiceTest
             await _personService.GetPersonByPersonID(person_response_from_update.PersonID);
 
         //Assert
-        Assert.Equal(person_response_from_get, person_response_from_update);
+        person_response_from_update.Should().Be(person_response_from_get);
     }
 
     #endregion
@@ -636,7 +644,7 @@ public class PersonsServiceTest
         bool isDeleted = await _personService.DeletePerson(person_response_from_add.PersonID);
 
         //Assert
-        Assert.True(isDeleted);
+        isDeleted.Should().BeTrue();
     }
 
     //If you supply an invalid PersonID, it should return false
@@ -648,7 +656,7 @@ public class PersonsServiceTest
         bool isDeleted = await _personService.DeletePerson(Guid.NewGuid());
 
         //Assert
-        Assert.False(isDeleted);
+        isDeleted.Should().BeFalse();
     }
 
     #endregion
