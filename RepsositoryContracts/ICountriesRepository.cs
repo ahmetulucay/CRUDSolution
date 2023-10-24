@@ -1,6 +1,6 @@
 ﻿namespace RepositoryContracts
 {
-    public class Class1
+    public interface ICountriesRepository
     {
 
     }
