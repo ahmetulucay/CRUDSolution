@@ -30,7 +30,7 @@ namespace RepositoryContracts
         /// <summary>
         /// Returns a country object based on the given country name.
         /// </summary>
-        /// <param name="countryName"></param>
+        /// <param name="countryName">Country name to search</param>
         /// <returns>Matching country or null</returns>
         Task<Country?> GetCountryByCountryName (string countryName);
     }
