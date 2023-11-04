@@ -3,6 +3,7 @@ using Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using RepositoryContracts;
 using ServiceContracts;
 using ServiceContracts.DTO;
 
@@ -10,12 +11,12 @@ namespace Services;
 public class CountriesService : ICountriesService
 {
     //private field
-    private readonly ApplicationDbContext _db;
+    private readonly ICountriesRepository _countriesRepository;
 
     //constructor
-    public CountriesService(ApplicationDbContext personsDbContext)
+    public CountriesService(ICountriesRepository countriesRepository)
     {
-        _db = personsDbContext;
+        _countriesRepository = countriesRepository;
     }
     public async Task<CountryResponse> AddCountry(CountryAddRequest? countryAddRequest)
     {
