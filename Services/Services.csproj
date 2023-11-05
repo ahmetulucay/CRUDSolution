@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RepsositoryContracts\RepositoryContracts.csproj" />
     <ProjectReference Include="..\ServiceContracts\ServiceContracts.csproj" />
   </ItemGroup>
 
