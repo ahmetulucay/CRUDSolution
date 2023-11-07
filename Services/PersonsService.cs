@@ -9,20 +9,19 @@ using CsvHelper;
 using System.Globalization;
 using OfficeOpenXml;
 using CsvHelper.Configuration;
+using RepositoryContracts;
 
 namespace Services;
 public class PersonsService : IPersonsService
 {
 
     //private field
-    private readonly ApplicationDbContext _db;
-    private readonly ICountriesService _countriesService;
+    private readonly IPersonsRepository _personsRepository;
 
     //constructor
-    public PersonsService(ApplicationDbContext personsDbContext, ICountriesService countriesService)
+    public PersonsService(IPersonsRepository personsRepository)
     {
-        _db = personsDbContext;
-        _countriesService = countriesService;
+        _personsRepository = personsRepository;
     }
 
     public PersonsService()
@@ -54,8 +53,8 @@ public class PersonsService : IPersonsService
         person.PersonID = Guid.NewGuid();
 
         //add person object to persons list
-        _db.Persons.Add(person);
-        await _db.SaveChangesAsync();
+        _personsRepository.Persons.Add(person);
+        await _personsRepository.SaveChangesAsync();
         //_db.sp_InsertPerson(person);
 
         //convert the Person object into PersonResponse type
@@ -65,7 +64,7 @@ public class PersonsService : IPersonsService
     public async Task<List<PersonResponse>> GetAllPersons()
     {
         //SELECT * FROM PERSONS
-        var persons = await _db.Persons.Include("Country").ToListAsync();
+        var persons = await _personsRepository.Persons.Include("Country").ToListAsync();
         return persons.Select(temp => temp.ToPersonResponse()).ToList();
         //return _db.sp_GetAllPersons().Select(temp => temp.ToPersonResponse()).ToList();
     }
@@ -75,7 +74,7 @@ public class PersonsService : IPersonsService
         if (personID == null)
             return null;
 
-        Person? person = await _db.Persons.Include("Country").FirstOrDefaultAsync(p => p.PersonID == personID);
+        Person? person = await _personsRepository.Persons.Include("Country").FirstOrDefaultAsync(p => p.PersonID == personID);
         
         if(person == null)
             return null;
@@ -222,7 +221,7 @@ public class PersonsService : IPersonsService
         ValidationHelper.ModelValidation(personUpdateRequest);
 
         //get matching person object to update
-        Person? matchingPerson = await _db.Persons.FirstOrDefaultAsync(temp => temp.PersonID == personUpdateRequest.PersonID);
+        Person? matchingPerson = await _personsRepository.Persons.FirstOrDefaultAsync(temp => temp.PersonID == personUpdateRequest.PersonID);
         if (matchingPerson == null)
         {
             throw new ArgumentException("Given person id doesn't exist");
@@ -237,7 +236,7 @@ public class PersonsService : IPersonsService
         matchingPerson.Address = personUpdateRequest.Address;
         matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
-        await _db.SaveChangesAsync(); //UPDATE
+        await _personsRepository.SaveChangesAsync(); //UPDATE
 
         return matchingPerson.ToPersonResponse();
     }
@@ -249,13 +248,13 @@ public class PersonsService : IPersonsService
             throw new ArgumentNullException(nameof(personID));
         }
 
-        Person? person = await _db.Persons.FirstOrDefaultAsync(temp => temp.PersonID == personID);
+        Person? person = await _personsRepository.Persons.FirstOrDefaultAsync(temp => temp.PersonID == personID);
 
         if (person == null)
             return false;
 
-        _db.Persons.Remove(_db.Persons.First(temp => temp.PersonID == personID));
-        await _db.SaveChangesAsync();
+        _personsRepository.Persons.Remove(_personsRepository.Persons.First(temp => temp.PersonID == personID));
+        await _personsRepository.SaveChangesAsync();
 
         return true;
     }
@@ -279,7 +278,7 @@ public class PersonsService : IPersonsService
         csvWriter.WriteField(nameof(PersonResponse.ReceiveNewsLetters));
         csvWriter.NextRecord();
 
-        List<PersonResponse> persons = _db.Persons
+        List<PersonResponse> persons = _personsRepository.Persons
             .Include("Country")
             .Select(tmp => tmp.ToPersonResponse()).ToList();
 
@@ -330,7 +329,7 @@ public class PersonsService : IPersonsService
             }
 
             int row = 2;
-            List<PersonResponse> persons = _db.Persons.Include("Country").Select(
+            List<PersonResponse> persons = _personsRepository.Persons.Include("Country").Select(
                 temp => temp.ToPersonResponse()).ToList();
             foreach (PersonResponse person in persons)
             {
