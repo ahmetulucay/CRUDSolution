@@ -4,11 +4,16 @@ using Services;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Entities;
 using Microsoft.EntityFrameworkCore;
+using RepositoryContracts;
+using Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 //add services into IoC Container
+builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
+builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
+
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IPersonsService, PersonsService>();
 

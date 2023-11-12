@@ -87,33 +87,27 @@ public class PersonsService : IPersonsService
         {
             nameof(PersonResponse.PersonName) =>
                 await _personsRepository.GetFilteredPersons(temp =>
-                temp.PersonName.Contains(searchString,
-                StringComparison.OrdinalIgnoreCase)),
+                temp.PersonName.Contains(searchString)),
 
             nameof(PersonResponse.Email) =>
                 await _personsRepository.GetFilteredPersons(temp =>
-                temp.Email.Contains(searchString,
-                StringComparison.OrdinalIgnoreCase)),
+                temp.Email.Contains(searchString)),
 
             nameof(PersonResponse.DateOfBirth) =>
                 await _personsRepository.GetFilteredPersons(temp =>
-                temp.DateOfBirth.Value.ToString("dd MMMM yyyy").Contains(searchString,
-                StringComparison.OrdinalIgnoreCase)),
+                temp.DateOfBirth.Value.ToString("dd MMMM yyyy").Contains(searchString)),
 
             nameof(PersonResponse.Gender) =>
                 await _personsRepository.GetFilteredPersons(temp =>
-                temp.Gender.Contains(searchString,
-                StringComparison.OrdinalIgnoreCase)),
+                temp.Gender.Contains(searchString)),
 
             nameof(PersonResponse.CountryID) =>
                 await _personsRepository.GetFilteredPersons(temp =>
-                temp.Country.CountryName.Contains(searchString,
-                StringComparison.OrdinalIgnoreCase)),
+                temp.Country.CountryName.Contains(searchString)),
 
             nameof(PersonResponse.Address) =>
                 await _personsRepository.GetFilteredPersons(temp =>
-                temp.Address.Contains(searchString,
-                StringComparison.OrdinalIgnoreCase)),
+                temp.Address.Contains(searchString)),
 
             _ => await _personsRepository.GetAllPersons()
         };
