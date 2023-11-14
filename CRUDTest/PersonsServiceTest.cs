@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using EntityFrameworkCoreMock;
 using AutoFixture;
 using FluentAssertions;
+using RepositoryContracts;
 
 namespace CRUDTests;
 public class PersonsServiceTest
@@ -16,6 +17,7 @@ public class PersonsServiceTest
     //private fields
     private readonly IPersonsService _personService;
     private readonly ICountriesService _countriesService;
+    private readonly IPersonsRepository _personRepository;
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly IFixture _fixture;
 
