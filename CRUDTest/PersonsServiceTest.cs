@@ -10,6 +10,7 @@ using EntityFrameworkCoreMock;
 using AutoFixture;
 using FluentAssertions;
 using RepositoryContracts;
+using Moq;
 
 namespace CRUDTests;
 public class PersonsServiceTest
@@ -17,6 +18,7 @@ public class PersonsServiceTest
     //private fields
     private readonly IPersonsService _personService;
     private readonly ICountriesService _countriesService;
+    private readonly Mock<IPersonsRepository> _personsRepositoryMock;
     private readonly IPersonsRepository _personRepository;
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly IFixture _fixture;
@@ -25,6 +27,7 @@ public class PersonsServiceTest
     public PersonsServiceTest(ITestOutputHelper testOutputHelper)
     {
         _fixture = new Fixture();
+        _personsRepositoryMock = new Mock<IPersonsRepository>();
         var countriesInitialData = new List<Country>() { };
         var personsInitialData = new List<Person>() { };
 
