@@ -18,7 +18,7 @@ public class PersonsServiceTest
     //private fields
     private readonly IPersonsService _personService;
     private readonly ICountriesService _countriesService;
-    private readonly Mock<IPersonsRepository> _personsRepositoryMock;
+    private readonly Mock<IPersonsRepository> _personRepositoryMock;
     private readonly IPersonsRepository _personRepository;
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly IFixture _fixture;
@@ -27,7 +27,7 @@ public class PersonsServiceTest
     public PersonsServiceTest(ITestOutputHelper testOutputHelper)
     {
         _fixture = new Fixture();
-        _personsRepositoryMock = new Mock<IPersonsRepository>();
+        _personRepositoryMock = new Mock<IPersonsRepository>();
         var countriesInitialData = new List<Country>() { };
         var personsInitialData = new List<Person>() { };
 
@@ -91,7 +91,7 @@ public class PersonsServiceTest
     //person id  
     [Fact]
 
-    public async Task AddPerson_ProperPersonDetails()
+    public async Task AddPerson_FullPersonDetails_ToBeSuccessful()
     {
         //Arrange
         PersonAddRequest? personAddRequest =
@@ -99,13 +99,19 @@ public class PersonsServiceTest
             .With(temp => temp.Email, "somebody@example.com")
             .Create();
 
+        Person person = personAddRequest.ToPerson();
+
+        //If we supply any argument value to the AddPerson method, it should 
+        //return the same return value
+        _personRepositoryMock.Setup(temp => temp.AddPerson(It.IsAny<Person>()))
+            .ReturnsAsync(person);
+
         //Act
         PersonResponse person_response_from_add = await _personService.AddPerson(personAddRequest);
         List<PersonResponse> persons_list = await _personService.GetAllPersons();
 
         //Assert
         //Assert.True(person_response_from_add.PersonID != Guid.Empty);
-
         person_response_from_add.Should().NotBe(Guid.Empty) ;
 
         //Assert.Contains(person_response_from_add, persons_list);

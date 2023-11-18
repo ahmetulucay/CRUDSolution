@@ -53,7 +53,7 @@ public class PersonsService : IPersonsService
         person.PersonID = Guid.NewGuid();
 
         //add person object to persons list
-        _personsRepository.AddPerson(person);
+        await _personsRepository.AddPerson(person);
         //_db.sp_InsertPerson(person);
 
         //convert the Person object into PersonResponse type
