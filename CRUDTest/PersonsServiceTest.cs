@@ -19,7 +19,8 @@ public class PersonsServiceTest
     private readonly IPersonsService _personService;
     private readonly ICountriesService _countriesService;
     private readonly Mock<IPersonsRepository> _personRepositoryMock;
-    private readonly IPersonsRepository _personRepository;
+    private readonly IPersonsRepository _personsRepository;
+
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly IFixture _fixture;
 
@@ -28,6 +29,8 @@ public class PersonsServiceTest
     {
         _fixture = new Fixture();
         _personRepositoryMock = new Mock<IPersonsRepository>();
+        _personsRepository = _personRepositoryMock.Object;
+
         var countriesInitialData = new List<Country>() { };
         var personsInitialData = new List<Person>() { };
 
@@ -41,7 +44,7 @@ public class PersonsServiceTest
 
         _countriesService = new CountriesService(null);
 
-        _personService = new PersonsService(null);
+        _personService = new PersonsService(_personsRepository);
         _testOutputHelper = testOutputHelper;
     }
 
@@ -100,6 +103,7 @@ public class PersonsServiceTest
             .Create();
 
         Person person = personAddRequest.ToPerson();
+        PersonResponse person_response_expected = person.ToPersonResponse();
 
         //If we supply any argument value to the AddPerson method, it should 
         //return the same return value
@@ -108,14 +112,12 @@ public class PersonsServiceTest
 
         //Act
         PersonResponse person_response_from_add = await _personService.AddPerson(personAddRequest);
-        List<PersonResponse> persons_list = await _personService.GetAllPersons();
+        person_response_expected.PersonID = person_response_from_add.PersonID;
 
         //Assert
         //Assert.True(person_response_from_add.PersonID != Guid.Empty);
         person_response_from_add.Should().NotBe(Guid.Empty) ;
-
-        //Assert.Contains(person_response_from_add, persons_list);
-        persons_list.Should().Contain(person_response_from_add);
+        person_response_from_add.Should().Be(person_response_expected);
     }
 
     //When we supply null value as Email, it ahould throw ArgumentException
