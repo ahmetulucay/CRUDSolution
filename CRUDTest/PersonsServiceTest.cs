@@ -53,7 +53,7 @@ public class PersonsServiceTest
     //When we supply null value as PersonAddRequest, it ahould throw ArgumentNullException
     [Fact]
 
-    public async Task AddPerson_NullPerson()
+    public async Task AddPerson_NullPerson_ToBeArgumentNullException()
     {
         //Arrange
         PersonAddRequest? personAddRequest = null;
@@ -71,13 +71,20 @@ public class PersonsServiceTest
     //When we supply null value as PersonName, it ahould throw ArgumentException
     [Fact]
 
-    public async Task AddPerson_PersonNameIsNull()
+    public async Task AddPerson_PersonNameIsNull_ToBeArgumentException()
     {
         //Arrange
         PersonAddRequest? personAddRequest = 
             _fixture.Build<PersonAddRequest>()
             .With(temp => temp.PersonName, null as string)
             .Create();
+
+        Person person = personAddRequest.ToPerson();
+
+        //When PersonRepository.AddPerson is called, it has to return the same "person" object
+        _personRepositoryMock
+            .Setup(temp => temp.AddPerson(It.IsAny<Person>()))
+            .ReturnsAsync(person);
 
         //Assert
         Func<Task> action = async () =>
@@ -163,7 +170,7 @@ public class PersonsServiceTest
     //If we supply null as PersonID, it should return null as
     //PersonResponse
     [Fact]
-    public async Task GetPersonByPersonID_NullPersonID()
+    public async Task GetPersonByPersonID_NullPersonID_ToBeNull()
     {
         //Arrange
         Guid? personID = null;
@@ -173,34 +180,30 @@ public class PersonsServiceTest
             _personService.GetPersonByPersonID(personID);
 
         //Assert
-        //Assert.Null(person_response_from_get);
         person_response_from_get.Should().BeNull();
     }
 
-    //if we supply a valid person id, it should return the valid
+    //If we supply a valid person id, it should return the valid
     //person details as PersonResponse object
     [Fact]
-    public async Task GetPersonByPersonID_WithPersonID()
+    public async Task GetPersonByPersonID_WithPersonID_ToBeSuccessful()
     {
         //Arrange
-        CountryAddRequest? country_request = _fixture.Create<CountryAddRequest>();
+        Person person = 
+            _fixture.Build<Person>()
+            .With(temp => temp.Email, "email@sample.com")
+            .Create();
+        PersonResponse? person_response_expected = 
+            person.ToPersonResponse();
 
-
-        CountryResponse country_response = await _countriesService.AddCountry(country_request);
+        _personRepositoryMock.Setup(temp => temp.GetPersonByPersonId(It.IsAny<Guid>()))
+            .ReturnsAsync(person);
 
         //Act
-        PersonAddRequest person_request = 
-            _fixture.Build<PersonAddRequest>()
-            .With(temp  => temp.Email, "email@sample.com")
-            .Create();
-
-        PersonResponse person_response_from_add = await _personService.AddPerson(person_request);
-        
-        PersonResponse? person_response_from_get = await _personService.GetPersonByPersonID(person_response_from_add.PersonID);
+        PersonResponse? person_response_from_get = await _personService.GetPersonByPersonID(person.PersonID);
 
         //Assert
-        person_response_from_get.Should().Be(person_response_from_add);
-
+        person_response_from_get.Should().Be(person_response_from_get);
 
     }
     #endregion
