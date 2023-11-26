@@ -64,6 +64,7 @@ public class PersonsService : IPersonsService
     {
         //SELECT * FROM PERSONS
         var persons = await _personsRepository.GetAllPersons();
+
         return persons.Select(temp => temp.ToPersonResponse()).ToList();
         //return _db.sp_GetAllPersons().Select(temp => temp.ToPersonResponse()).ToList();
     }
