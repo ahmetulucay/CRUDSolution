@@ -11,6 +11,7 @@ using AutoFixture;
 using FluentAssertions;
 using RepositoryContracts;
 using Moq;
+using System.Linq.Expressions;
 
 namespace CRUDTests;
 public class PersonsServiceTest
@@ -106,11 +107,12 @@ public class PersonsServiceTest
         //Arrange
         PersonAddRequest? personAddRequest =
             _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.Email, "somebody@example.com")
+            .With(temp => temp.Email, "someone@example.com")
             .Create();
 
         Person person = personAddRequest.ToPerson();
-        PersonResponse person_response_expected = person.ToPersonResponse();
+        PersonResponse person_response_expected = 
+            person.ToPersonResponse();
 
         //If we supply any argument value to the AddPerson method, it should 
         //return the same return value
@@ -118,12 +120,14 @@ public class PersonsServiceTest
             .ReturnsAsync(person);
 
         //Act
-        PersonResponse person_response_from_add = await _personService.AddPerson(personAddRequest);
-        person_response_expected.PersonID = person_response_from_add.PersonID;
+        PersonResponse person_response_from_add = await 
+            _personService.AddPerson(personAddRequest);
+
+        person_response_expected.PersonID = 
+            person_response_from_add.PersonID;
 
         //Assert
-        //Assert.True(person_response_from_add.PersonID != Guid.Empty);
-        person_response_from_add.Should().NotBe(Guid.Empty) ;
+        person_response_from_add.PersonID.Should().NotBe(Guid.Empty) ;
         person_response_from_add.Should().Be(person_response_expected);
     }
 
@@ -191,6 +195,7 @@ public class PersonsServiceTest
         //Arrange
         Person person = _fixture.Build<Person>()
             .With(temp => temp.Email, "email@sample.com")
+            .With(temp => temp.Country, null as Country)
             .Create();
         PersonResponse person_response_expected = 
             person.ToPersonResponse();
@@ -287,56 +292,43 @@ public class PersonsServiceTest
 
     [Fact]
 
-    public async Task GetFilteredPersons_EmptySearchText()
+    public async Task GetFilteredPersons_EmptySearchText_ToBeSuccessful()
     {
         //Arrange
-        CountryAddRequest country_request_1 =
-            _fixture.Create<CountryAddRequest>();
-        CountryAddRequest country_request_2 =
-            _fixture.Create<CountryAddRequest>();
-
-        CountryResponse country_response_1 = 
-            await _countriesService.AddCountry(country_request_1);
-        CountryResponse country_response_2 = 
-            await _countriesService.AddCountry(country_request_2);
-
-        PersonAddRequest person_request_1 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.Email, "someone1@example.com")
-            .Create();
-
-        PersonAddRequest person_request_2 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.Email, "someone2@example.com")
-            .Create();
-
-        PersonAddRequest person_request_3 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.Email, "someone3@example.com")
-            .Create();
-
-        List<PersonAddRequest> person_requests = new List<PersonAddRequest>()
+        List<Person> persons = new List<Person>()
         {
-            person_request_1, person_request_2, person_request_3
+            _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_1@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create(),
+
+            _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_2@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create(),
+
+             _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_3@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create()
         };
 
-        List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
-
-        foreach (PersonAddRequest person_request in person_requests)
-        {
-            PersonResponse person_response = await _personService.AddPerson(person_request);
-            person_response_list_from_add.Add(person_response);
-        }
+        List<PersonResponse> person_response_list_expected =
+            persons.Select(temp => temp.ToPersonResponse()).ToList();
 
         //Print person_response_list_from_add
         _testOutputHelper.WriteLine("Expected: ");
-        foreach (PersonResponse person_response_from_add in person_response_list_from_add)
+        foreach (PersonResponse person_response_from_add in person_response_list_expected)
         {
             _testOutputHelper.WriteLine(person_response_from_add.ToString());
         }
 
+        _personRepositoryMock.Setup(temp => temp.GetFilteredPersons(It.IsAny<Expression<Func<Person, bool>>>()))
+            .ReturnsAsync(persons);
+
         //Act
-        List<PersonResponse> persons_list_from_search = await _personService.GetFilteredPersons(nameof(Person.PersonName), "");
+        List<PersonResponse> persons_list_from_search = await 
+            _personService.GetFilteredPersons(nameof(Person.PersonName), "");
 
         //Print person_list_from_get
         _testOutputHelper.WriteLine("Actual: ");
@@ -346,69 +338,50 @@ public class PersonsServiceTest
         }
 
         //Assert
-        persons_list_from_search.Should().BeEquivalentTo(person_response_list_from_add);
+        persons_list_from_search.Should().BeEquivalentTo(person_response_list_expected);
     }
 
-    //First we will add few persons; and then we will search based on person name with some
-    //search string. It should return the matching persons.
+    //Search based on person name with some search string. It should return the matching persons.
 
     [Fact]
 
-    public async Task GetFilteredPersons_SearchByPersonName()
+    public async Task GetFilteredPersons_SearchByPersonName_ToBeSuccessful()
     {
         //Arrange
-        CountryAddRequest country_request_1 = new CountryAddRequest()
-        { CountryName = "USA" };
-        CountryAddRequest country_request_2 = new CountryAddRequest()
-        { CountryName = "United Kingdom" };
-
-        CountryResponse country_response_1 = await _countriesService.AddCountry(country_request_1);
-        CountryResponse country_response_2 = await _countriesService.AddCountry(country_request_2);
-
-        PersonAddRequest person_request_1 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Monica")
-            .With(temp => temp.Email, "someone1@example.com")
-            .With(temp => temp.CountryID, country_response_1.CountryID)
-            .Create();
-
-        PersonAddRequest person_request_2 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Anica")
-            .With(temp => temp.Email, "someone2@example.com")
-            .With(temp => temp.CountryID, country_response_1.CountryID)
-            .Create();
-
-        PersonAddRequest person_request_3 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "john")
-            .With(temp => temp.Email, "someone3@example.com")
-            .With(temp => temp.CountryID, country_response_2.CountryID)
-            .Create();
-
-        List<PersonAddRequest> person_requests = new List<PersonAddRequest>()
+        List<Person> persons = new List<Person>()
         {
-            person_request_1, person_request_2, person_request_3
+            _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_1@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create(),
+
+            _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_2@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create(),
+
+             _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_3@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create()
         };
 
-        List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
-
-        foreach (PersonAddRequest person_request in person_requests)
-        {
-            PersonResponse person_response = await _personService.AddPerson(person_request);
-            person_response_list_from_add.Add(person_response);
-        }
+        List<PersonResponse> person_response_list_expected =
+            persons.Select(temp => temp.ToPersonResponse()).ToList();
 
         //Print person_response_list_from_add
         _testOutputHelper.WriteLine("Expected: ");
-        foreach (PersonResponse person_response_from_add in person_response_list_from_add)
+        foreach (PersonResponse person_response_from_add in person_response_list_expected)
         {
             _testOutputHelper.WriteLine(person_response_from_add.ToString());
         }
 
+        _personRepositoryMock.Setup(temp => temp.GetFilteredPersons(It.IsAny<Expression<Func<Person, bool>>>()))
+            .ReturnsAsync(persons);
+
         //Act
-        List<PersonResponse> persons_list_from_search = 
-            await _personService.GetFilteredPersons(nameof(Person.PersonName), "nica");
+        List<PersonResponse> persons_list_from_search = await
+            _personService.GetFilteredPersons(nameof(Person.PersonName), "sa");
 
         //Print person_list_from_get
         _testOutputHelper.WriteLine("Actual: ");
@@ -418,9 +391,7 @@ public class PersonsServiceTest
         }
 
         //Assert
-        persons_list_from_search.Should().OnlyContain(temp => 
-        temp.PersonName.Contains("nica", 
-        StringComparison.OrdinalIgnoreCase));
+        persons_list_from_search.Should().BeEquivalentTo(person_response_list_expected);
 
     }
 
