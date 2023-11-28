@@ -403,60 +403,44 @@ public class PersonsServiceTest
     //on PersonName
     [Fact]
 
-    public async Task GetSortedPersons()
+    public async Task GetSortedPersons_ToBeSuccessful()
     {
         //Arrange
-        CountryAddRequest country_request_1 = new CountryAddRequest()
-        { CountryName = "USA" };
-        CountryAddRequest country_request_2 = new CountryAddRequest()
-        { CountryName = "United Kingdom" };
-
-        CountryResponse country_response_1 = await _countriesService.AddCountry(country_request_1);
-        CountryResponse country_response_2 = await _countriesService.AddCountry(country_request_2);
-
-        PersonAddRequest person_request_1 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Jenny")
-            .With(temp => temp.Email, "someone1@example.com")
-            .With(temp => temp.CountryID, country_response_1.CountryID)
-            .Create();
-
-        PersonAddRequest person_request_2 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Maria")
-            .With(temp => temp.Email, "someone2@example.com")
-            .With(temp => temp.CountryID, country_response_1.CountryID)
-            .Create();
-
-        PersonAddRequest person_request_3 =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Matthew")
-            .With(temp => temp.Email, "someone3@example.com")
-            .With(temp => temp.CountryID, country_response_2.CountryID)
-            .Create();
-
-        List<PersonAddRequest> person_requests = new List<PersonAddRequest>()
+        List<Person> persons = new List<Person>()
         {
-            person_request_1, person_request_2, person_request_3
+            _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_1@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create(),
+
+            _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_2@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create(),
+
+             _fixture.Build<Person>()
+            .With(temp => temp.Email, "someone_3@example.com")
+            .With(temp => temp.Country, null as Country)
+            .Create()
         };
 
-        List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
+        List<PersonResponse> person_response_list_expected =
+            persons.Select(temp => temp.ToPersonResponse()).ToList();
 
-        foreach (PersonAddRequest person_request in person_requests)
-        {
-            PersonResponse person_response = await _personService.AddPerson(person_request);
-            person_response_list_from_add.Add(person_response);
-        }
+        _personRepositoryMock
+            .Setup(temp => temp.GetAllPersons())
+            .ReturnsAsync(persons);
 
         //Print person_response_list_from_add
         _testOutputHelper.WriteLine("Expected: ");
-        foreach (PersonResponse person_response_from_add in person_response_list_from_add)
+        foreach (PersonResponse person_response_from_add in person_response_list_expected)
         {
             _testOutputHelper.WriteLine(person_response_from_add.ToString());
         }
 
 
-        List<PersonResponse> allPersons = await _personService.GetAllPersons();
+        List<PersonResponse> allPersons = await 
+            _personService.GetAllPersons();
 
         //Act
         List<PersonResponse> persons_list_from_sort = await _personService.GetSortedPersons(allPersons, nameof(Person.PersonName), SortOrderOptions.DESC);
@@ -468,11 +452,7 @@ public class PersonsServiceTest
             _testOutputHelper.WriteLine(person_response_from_get.ToString());
         }
 
-        //person_response_list_from_add = person_response_list_from_add.OrderByDescending(temp => temp.PersonName).ToList();
-
         //Assert
-        //persons_list_from_sort.Should().BeEquivalentTo(person_response_list_from_add);
-
         persons_list_from_sort.Should().BeInDescendingOrder(temp =>
         temp.PersonName);
 
