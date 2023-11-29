@@ -465,7 +465,7 @@ public class PersonsServiceTest
     //throw ArgumentNullException
 
     [Fact]
-    public async Task UpdatePerson_NullPerson()
+    public async Task UpdatePerson_NullPerson_ToBeArgumentNullException()
     {
         //Arrange
         PersonUpdateRequest? person_update_request = null;
@@ -483,7 +483,7 @@ public class PersonsServiceTest
     //When we supply invalid person id, it should throw ArgumentException
 
     [Fact]
-    public async Task UpdatePerson_InvalidPersonID()
+    public async Task UpdatePerson_InvalidPersonID_ToBeArgumentException()
     {
         //Arrange
         PersonUpdateRequest? person_update_request =
@@ -502,29 +502,20 @@ public class PersonsServiceTest
 
     //When the PersonName is null, it should throw ArgumentException
     [Fact]
-    public async Task UpdatePerson_PersonNameIsNull()
+    public async Task UpdatePerson_PersonNameIsNull_ToBeArgumentException()
     {
         //Arrange
-        CountryAddRequest country_request =
-            _fixture.Create<CountryAddRequest>();
-
-        CountryResponse country_response = 
-            await _countriesService.AddCountry(country_request);
-
-        PersonAddRequest person_add_request =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Jessica")
+        Person person = _fixture.Build<Person>()
+            .With(temp => temp.PersonName, null as string)
             .With(temp => temp.Email, "someone@example.com")
-            .With(temp => temp.CountryID, country_response.CountryID)
+            .With(temp => temp.Country, null as Country)
             .Create();
 
         PersonResponse person_response_from_add = 
-            await _personService.AddPerson(person_add_request);
+            person.ToPersonResponse();
 
         PersonUpdateRequest person_update_request = 
             person_response_from_add.ToPersonUpdateRequest();
-
-        person_update_request.PersonName = null;
 
         //Act
         var action = async () =>
