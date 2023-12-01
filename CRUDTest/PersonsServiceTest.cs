@@ -531,28 +531,21 @@ public class PersonsServiceTest
 
     //First, add a new person and try to update the person name and email
     [Fact]
-    public async Task UpdatePerson_PersonFullDetailsUpdation()
+    public async Task UpdatePerson_PersonFullDetails_ToBeSuccessful()
     {
         //Arrange
-        CountryAddRequest country_request =
-            _fixture.Create<CountryAddRequest>();
-
-        CountryResponse country_response =
-            await _countriesService.AddCountry(country_request);
-
-        PersonAddRequest person_add_request =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Halle")
+        Person person = _fixture.Build<Person>()
             .With(temp => temp.Email, "someone@example.com")
-            .With(temp => temp.CountryID, country_response.CountryID)
+            .With(temp => temp.Country, null as Country)
             .Create();
 
-        PersonResponse person_response_from_add = await _personService.AddPerson(person_add_request);
+        PersonResponse person_response_expected = person.ToPersonResponse();
 
-        PersonUpdateRequest person_update_request = person_response_from_add.ToPersonUpdateRequest();
+        PersonUpdateRequest person_update_request = 
+            person_response_expected.ToPersonUpdateRequest();
 
-        person_update_request.PersonName = "William";
-        person_update_request.Email = "william@gmail.com";
+        _personRepositoryMock.Setup(temp => temp.UpdatePerson(It.IsAny<Person>()))
+            .ReturnsAsync(person);
 
         //Act
         PersonResponse person_response_from_update = 
