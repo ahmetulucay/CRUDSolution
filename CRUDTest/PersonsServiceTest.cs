@@ -32,19 +32,6 @@ public class PersonsServiceTest
         _personRepositoryMock = new Mock<IPersonsRepository>();
         _personsRepository = _personRepositoryMock.Object;
 
-        var countriesInitialData = new List<Country>() { };
-        var personsInitialData = new List<Person>() { };
-
-        DbContextMock<ApplicationDbContext> dbContextMock = new
-            DbContextMock<ApplicationDbContext>(
-            new DbContextOptionsBuilder<ApplicationDbContext>().Options);
-
-        ApplicationDbContext dbContext = dbContextMock.Object;
-        dbContextMock.CreateDbSetMock(temp => temp.Countries, countriesInitialData);
-        dbContextMock.CreateDbSetMock(temp => temp.Persons, personsInitialData);
-
-        _countriesService = new CountriesService(null);
-
         _personService = new PersonsService(_personsRepository);
         _testOutputHelper = testOutputHelper;
     }
@@ -87,13 +74,13 @@ public class PersonsServiceTest
             .Setup(temp => temp.AddPerson(It.IsAny<Person>()))
             .ReturnsAsync(person);
 
-        //Assert
+        //Act
         Func<Task> action = async () =>
         {
-            //Act
             await _personService.AddPerson(personAddRequest);
         };
 
+        //Assert
         await action.Should().ThrowAsync<ArgumentException>();
     }
 
@@ -111,7 +98,7 @@ public class PersonsServiceTest
             .Create();
 
         Person person = personAddRequest.ToPerson();
-        PersonResponse person_response_expected = 
+        PersonResponse person_response_expected =
             person.ToPersonResponse();
 
         //If we supply any argument value to the AddPerson method, it should 
@@ -509,6 +496,7 @@ public class PersonsServiceTest
             .With(temp => temp.PersonName, null as string)
             .With(temp => temp.Email, "someone@example.com")
             .With(temp => temp.Country, null as Country)
+            .With(temp => temp.Gender, "Male")
             .Create();
 
         PersonResponse person_response_from_add = 
@@ -537,6 +525,7 @@ public class PersonsServiceTest
         Person person = _fixture.Build<Person>()
             .With(temp => temp.Email, "someone@example.com")
             .With(temp => temp.Country, null as Country)
+            .With(temp => temp.Gender, "Male")
             .Create();
 
         PersonResponse person_response_expected = person.ToPersonResponse();
@@ -544,18 +533,20 @@ public class PersonsServiceTest
         PersonUpdateRequest person_update_request = 
             person_response_expected.ToPersonUpdateRequest();
 
-        _personRepositoryMock.Setup(temp => temp.UpdatePerson(It.IsAny<Person>()))
+        _personRepositoryMock
+            .Setup(temp => temp.UpdatePerson(It.IsAny<Person>()))
+            .ReturnsAsync(person);
+
+        _personRepositoryMock
+            .Setup(temp => temp.GetPersonByPersonId(It.IsAny<Guid>()))
             .ReturnsAsync(person);
 
         //Act
         PersonResponse person_response_from_update = 
             await _personService.UpdatePerson(person_update_request);
 
-        PersonResponse? person_response_from_get = 
-            await _personService.GetPersonByPersonID(person_response_from_update.PersonID);
-
         //Assert
-        person_response_from_update.Should().Be(person_response_from_get);
+        person_response_from_update.Should().Be(person_response_expected);
     }
 
     #endregion
@@ -565,27 +556,26 @@ public class PersonsServiceTest
     //If you supply an valid PersonID, it should return true
     [Fact]
 
-    public async Task DeletePerson_ValidPersonID()
+    public async Task DeletePerson_ValidPersonID_ToBeSuccessful()
     {
         //Arrange
-        CountryAddRequest country_request =
-            _fixture.Create<CountryAddRequest>();
 
-        CountryResponse country_response =
-            await _countriesService.AddCountry(country_request);
-
-        PersonAddRequest person_add_request =
-            _fixture.Build<PersonAddRequest>()
-            .With(temp => temp.PersonName, "Tom")
+        Person person = _fixture.Build<Person>()
             .With(temp => temp.Email, "someone@example.com")
-            .With(temp => temp.CountryID, country_response.CountryID)
+            .With(temp => temp.Country, null as Country)
+            .With(temp => temp.Gender, "Female")
             .Create();
 
-        PersonResponse person_response_from_add = 
-            await _personService.AddPerson(person_add_request);
+        _personRepositoryMock
+            .Setup(temp => temp.DeletePersonByPersonID(It.IsAny<Guid>()))
+            .ReturnsAsync(true);
+
+        _personRepositoryMock
+            .Setup(temp => temp.GetPersonByPersonId(It.IsAny<Guid>()))
+            .ReturnsAsync(person);
 
         //Act
-        bool isDeleted = await _personService.DeletePerson(person_response_from_add.PersonID);
+        bool isDeleted = await _personService.DeletePerson(person.PersonID);
 
         //Assert
         isDeleted.Should().BeTrue();

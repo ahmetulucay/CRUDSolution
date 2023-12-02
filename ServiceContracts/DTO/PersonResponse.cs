@@ -85,7 +85,7 @@ public static class PersonExtensions
     public static PersonResponse ToPersonResponse(this Person person)
     {
         // person => convert => PersonResponse
-        return new PersonResponse() { PersonID = (Guid)person.PersonID,
+        return new PersonResponse() { PersonID = (Guid) person.PersonID,
             PersonName = person.PersonName, Email = person.Email,
             DateOfBirth = person.DateOfBirth, ReceiveNewsLetters = (bool)person.ReceiveNewsLetters,
             Address = person.Address, CountryID = person.CountryID,
