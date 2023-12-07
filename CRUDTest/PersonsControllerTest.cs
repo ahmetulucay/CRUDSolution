@@ -7,6 +7,7 @@ using FluentAssertions;
 using CRUDExample.Controllers;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace CRUDTests;
@@ -52,9 +53,20 @@ public class PersonsControllerTest
             It.IsAny<SortOrderOptions>()))
             .ReturnsAsync(persons_response_list);
 
+        //Act
+        IActionResult result = await personsController.Index(_fixture.Create<string>(), _fixture.Create<string>(), 
+            _fixture.Create<string>(), _fixture.Create<SortOrderOptions>());
+
+        //Assert
+        ViewResult viewResult =  Assert.IsType<ViewResult>(result);
+
+        viewResult.ViewData.Model.Should()
+            .BeAssignableTo<IEnumerable<PersonResponse>>();
+
+        viewResult.ViewData.Model.Should()
+            .Be(persons_response_list);
+
     }
-
-
 
     #endregion
 }
