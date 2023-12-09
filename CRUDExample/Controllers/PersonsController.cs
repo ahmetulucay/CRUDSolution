@@ -73,7 +73,9 @@ namespace CRUDExample.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<CountryResponse> countries = await _countriesService.GetAllCountries();
+                List<CountryResponse> countries = await 
+                    _countriesService.GetAllCountries();
+
                 ViewBag.Countries = countries.Select(temp => new SelectListItem()
                 {
                     Text = temp.CountryName,
