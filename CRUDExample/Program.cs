@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using ServiceContracts;
 using Services;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
@@ -36,3 +34,5 @@ app.UseRouting();
 app.MapControllers();
 
 app.Run();
+
+partial class Program { } //make the auti-generated Program accessible programmatically
