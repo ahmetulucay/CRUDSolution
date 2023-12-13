@@ -35,4 +35,4 @@ app.MapControllers();
 
 app.Run();
 
-partial class Program { } //make the auti-generated Program accessible programmatically
+public partial class Program { } //make the auto-generated Program accessible programmatically
