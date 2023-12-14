@@ -20,7 +20,12 @@ namespace CRUDTests
 
             builder.ConfigureServices(services => 
             {
-                services.SingleOrDefault(temp => temp.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
+                var descripter = services.SingleOrDefault
+                (temp => temp.ServiceType == typeof
+                (DbContextOptions<ApplicationDbContext>));
+
+                if (descripter != null) services.Remove(descripter);
+
             });
         }
     }
