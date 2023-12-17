@@ -73,7 +73,9 @@ namespace CRUDExample.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<CountryResponse> countries = await _countriesService.GetAllCountries();
+                List<CountryResponse> countries = await 
+                    _countriesService.GetAllCountries();
+
                 ViewBag.Countries = countries.Select(temp => new SelectListItem()
                 {
                     Text = temp.CountryName,
@@ -171,14 +173,35 @@ namespace CRUDExample.Controllers
             await _personsService.DeletePerson(personUpdateResult.PersonID);
             return RedirectToAction("Index");
         }
-
-        public async Task<IActionResult> PersonPDF()
+        [Route("PersonsPDF")]
+        public async Task<IActionResult> PersonsPDF()
         {
             //Getlist of persons
-            List<PersonResponse> personResponses = await _personsService.GetAllPersons();
+            List<PersonResponse> persons = await _personsService.GetAllPersons();
 
             //return view as pdf
-            return new ViewAsPdf();
+            return new ViewAsPdf("PersonsPDF", persons, ViewData)
+            {
+                PageMargins = new Rotativa.AspNetCore.Options.Margins()
+                {
+                    Top = 20, Bottom = 20, Right = 20, Left = 20
+                },
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape
+            };
+        }
+
+        [Route("PersonsCSV")]
+        public async Task<IActionResult> PersonsCSV()
+        {
+            MemoryStream stream = await _personsService.GetPersonsCSV();
+            return File(stream, "application/octet-stream", "persons.csv");
+        }
+
+        [Route("PersonsExcel")]
+        public async Task<IActionResult> PersonsExcel()
+        {
+            MemoryStream stream = await _personsService.GetPersonsExcel();
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "persons.xlsx");
         }
     }
 }

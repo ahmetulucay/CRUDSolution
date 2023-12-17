@@ -1,11 +1,5 @@
-﻿using System;
-using ServiceContracts.DTO;
+﻿using ServiceContracts.DTO;
 using ServiceContracts.Enums;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualBasic.FileIO;
 
 namespace ServiceContracts;
 
@@ -65,4 +59,16 @@ public interface IPersonsService
     /// <param name="personID">PersonID to delete</param>
     /// <returns>Returns true, if the deletion is successful; otherwise false</returns>
     Task<bool> DeletePerson(Guid? personID);
+
+    /// <summary>
+    /// Returns persons a CSV
+    /// </summary>
+    /// <returns>Returns the memory stream with CSV data of persons</returns>
+    Task<MemoryStream> GetPersonsCSV();
+
+    /// <summary>
+    /// Returns persons as Excel
+    /// </summary>
+    /// <returns>Returns the memory stream with Excel data of persons</returns>
+    Task<MemoryStream> GetPersonsExcel();
 }
