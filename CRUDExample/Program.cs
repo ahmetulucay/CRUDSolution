@@ -26,8 +26,8 @@ if (builder.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage(); 
 }
-
-Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
+if (builder.Environment.IsEnvironment("Test") == false)
+    Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
 
 app.UseStaticFiles();
 app.UseRouting();
