@@ -5,6 +5,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Fizzler;
+using Fizzler.Systems.HtmlAgilityPack;
+using HtmlAgilityPack;
 
 namespace CRUDTests
 {
@@ -30,7 +33,15 @@ namespace CRUDTests
             HttpResponseMessage response = await _client.GetAsync("/Persons/Index");
 
             //Assert
-            response.Should().BeSuccessful();
+            response.Should().BeSuccessful(); //2xx
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            HtmlDocument html = new HtmlDocument();
+            html.LoadHtml(responseBody);
+
+            var document = html.DocumentNode;
+            document.QuerySelectorAll("table.persons").Should().NotBeNull();
         }
 
         #endregion
