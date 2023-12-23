@@ -22,10 +22,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
+//create application pipeline
 if (builder.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage(); 
 }
+
+app.Logger.LogDebug("debug-message");
+app.Logger.LogInformation("information-message");
+app.Logger.LogWarning("warning-message");
+app.Logger.LogError("error-message");
+app.Logger.LogCritical("critical-message");
+
 if (builder.Environment.IsEnvironment("Test") == false)
     Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
 
