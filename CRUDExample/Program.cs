@@ -41,6 +41,8 @@ public partial class Program {
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseHttpLogging();
+
         //app.Logger.LogDebug("debug-message");
         //app.Logger.LogInformation("information-message");
         //app.Logger.LogWarning("warning-message");
