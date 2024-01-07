@@ -33,6 +33,12 @@ public partial class Program {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
 
+        builder.Services.AddHttpLogging(options =>
+        {
+            options.LoggingFields =
+            Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+        });
+
         var app = builder.Build();
 
         //create application pipeline
