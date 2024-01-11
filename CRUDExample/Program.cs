@@ -5,34 +5,65 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 using Repositories;
 
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllersWithViews();
+public partial class Program {
+    private static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-//add services into IoC Container
-builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
-builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
+        //Logging
+        builder.Host.ConfigureLogging(loggingProvider =>
+        {
+            loggingProvider.ClearProviders();
+            loggingProvider.AddConsole();
+            loggingProvider.AddDebug();
+            loggingProvider.AddEventLog();
+        });
 
-builder.Services.AddScoped<ICountriesService, CountriesService>();
-builder.Services.AddScoped<IPersonsService, PersonsService>();
+        builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+        //add services into IoC Container
+        builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
+        builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
 
-var app = builder.Build();
+        builder.Services.AddScoped<ICountriesService, CountriesService>();
+        builder.Services.AddScoped<IPersonsService, PersonsService>();
 
-if (builder.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage(); 
-}
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+        });
 
-Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
+        builder.Services.AddHttpLogging(options =>
+        {
+            options.LoggingFields =
+            Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+        });
 
-app.UseStaticFiles();
-app.UseRouting();
-app.MapControllers();
+        var app = builder.Build();
 
-app.Run();
+        //create application pipeline
+        if (builder.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
+        app.UseHttpLogging();
+
+        //app.Logger.LogDebug("debug-message");
+        //app.Logger.LogInformation("information-message");
+        //app.Logger.LogWarning("warning-message");
+        //app.Logger.LogError("error-message");
+        //app.Logger.LogCritical("critical-message");
+
+        if (builder.Environment.IsEnvironment("Test") == false)
+            Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
+
+        app.UseStaticFiles();
+        app.UseRouting();
+        app.MapControllers();
+
+        app.Run();
+    }
+} //make the auto-generated Program accessible programmatically
 
 public partial class Program { } //make the auto-generated Program accessible programmatically
