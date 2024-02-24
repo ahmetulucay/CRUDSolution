@@ -11,6 +11,7 @@ using OfficeOpenXml;
 using CsvHelper.Configuration;
 using RepositoryContracts;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Services;
 public class PersonsService : IPersonsService
@@ -19,12 +20,14 @@ public class PersonsService : IPersonsService
     //private field
     private readonly IPersonsRepository _personsRepository;
     private readonly ILogger<PersonsService> _logger;
+    private readonly IDiagnosticContext _diagnosticContext;
 
     //constructor
-    public PersonsService(IPersonsRepository personsRepository, ILogger<PersonsService> logger)
+    public PersonsService(IPersonsRepository personsRepository, ILogger<PersonsService> logger, IDiagnosticContext diagnosticContext)
     {
         _personsRepository = personsRepository;
         _logger = logger;
+        _diagnosticContext = diagnosticContext;
     }
 
     public PersonsService()
@@ -116,6 +119,8 @@ public class PersonsService : IPersonsService
 
             _ => await _personsRepository.GetAllPersons()
         };
+
+        _diagnosticContext.Set("Persons", persons);
 
         return persons.Select(temp => temp.ToPersonResponse()).ToList();
     }

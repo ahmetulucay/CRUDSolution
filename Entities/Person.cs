@@ -33,4 +33,12 @@ public class Person
     [ForeignKey("CountryID")]
     public virtual Country? Country { get; set; }
 
+    public override string ToString()
+    {
+        return $"Person ID: {PersonID}, Person Name: {PersonName}, " +
+            $"Email: {Email},Country ID: {CountryID}, " +
+            $"Country: {Country?.CountryName}, Address: {Address?.ToString()}" +
+            $"Receive News Letters: {ReceiveNewsLetters}";
+    }
+
 }
