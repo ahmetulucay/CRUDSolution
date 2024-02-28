@@ -1,7 +1,5 @@
 ﻿using AutoFixture;
 using Moq;
-using Xunit;
-using System.Threading.Tasks;
 using ServiceContracts;
 using FluentAssertions;
 using CRUDExample.Controllers;
