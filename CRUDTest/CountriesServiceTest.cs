@@ -48,16 +48,13 @@ public class CountriesServiceTest
     {
         //Arrange
         CountryAddRequest? request = new CountryAddRequest()
-        {
-            CountryName = null
-        };
+        {CountryName = null};
 
         //Assert
         await Assert.ThrowsAsync<ArgumentException>(async () =>
-        {
+        {   
             //Act
-            await _countriesService.AddCountry(request);
-        });
+            await _countriesService.AddCountry(request);});
     }
 
     //When CountryName is duplicate, it should throw ArgumentException
