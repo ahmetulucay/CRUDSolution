@@ -43,8 +43,11 @@ public class PersonsListActionFilter : IActionFilter
                 if (searchByOptions.Any(temp => temp == searchBy) == false)
                 {
                     _logger.LogInformation("searchBy actual value {searchBy}", searchBy);
+                    
                     context.ActionArguments["searchBy"] = nameof(PersonResponse.PersonName);
-                    _logger.LogInformation("searchBy updated value {searchBy}", searchBy);
+
+                    _logger.LogInformation("searchBy updated value {searchBy}",
+                    context.ActionArguments["searchBy"]);
                 }
             }
 
