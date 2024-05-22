@@ -95,7 +95,6 @@ namespace CRUDExample.Controllers
                 e.ErrorMessage).ToList();
                 return View();
             }
-
             //call the service method
             PersonResponse personResponse = await _personsService.AddPerson(personAddRequest);
 
@@ -105,7 +104,7 @@ namespace CRUDExample.Controllers
         }
 
         [HttpGet]
-        [Route("[action]/{personID}")] //Eg:  /persons/edit/1
+        [Route("[action]/{personID}")] //Eg:/persons/edit/1
         public async Task<IActionResult> Edit(Guid personID)
         {
             PersonResponse? personResponse = await _personsService.GetPersonByPersonID(personID);
@@ -182,6 +181,7 @@ namespace CRUDExample.Controllers
             await _personsService.DeletePerson(personUpdateResult.PersonID);
             return RedirectToAction("Index");
         }
+
         [Route("PersonsPDF")]
         public async Task<IActionResult> PersonsPDF()
         {
