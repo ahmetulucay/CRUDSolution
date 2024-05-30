@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using CRUDExample.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
 using ServiceContracts.DTO;
 
 namespace CRUDExample.Filters.ActionFilters;
@@ -14,10 +15,18 @@ public class PersonsListActionFilter : IActionFilter
     {
         //To do: add after logic here
         _logger.LogInformation("PersonsListActionFilter.OnActionExecuted method");
+
+        PersonsController persosController = (PersonsController)context.Controller;
+
+        IDictionary<string, object?>? parameters = (IDictionary<string, object?>) 
+            context.HttpContext.Items["arguments"]; 
+
+        persosController.ViewData["searchBy"] = context.HttpContext.Items["arguments"];
     }
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
+        context.HttpContext.Items["arguments"] = context.ActionArguments;
         //To do: add before logic here
         _logger.LogInformation("PersonsListActionFilter.OnActionExecuting method");
 
