@@ -1,5 +1,4 @@
-﻿
-using Entities;
+﻿using Entities;
 using EntityFrameworkCoreMock;
 using Microsoft.EntityFrameworkCore;
 using ServiceContracts;
@@ -17,8 +16,7 @@ public class CountriesServiceTest
         var countriesInitialData = new List<Country>() { };
 
         DbContextMock<ApplicationDbContext> dbContextMock = new
-            DbContextMock<ApplicationDbContext>(
-            new DbContextOptionsBuilder<ApplicationDbContext>().Options);
+            DbContextMock<ApplicationDbContext>(new DbContextOptionsBuilder<ApplicationDbContext>().Options);
 
         ApplicationDbContext dbContext = dbContextMock.Object;
         dbContextMock.CreateDbSetMock(temp => temp.Countries, countriesInitialData);
@@ -48,16 +46,13 @@ public class CountriesServiceTest
     {
         //Arrange
         CountryAddRequest? request = new CountryAddRequest()
-        {
-            CountryName = null
-        };
+        {CountryName = null};
 
         //Assert
         await Assert.ThrowsAsync<ArgumentException>(async () =>
-        {
+        {   
             //Act
-            await _countriesService.AddCountry(request);
-        });
+            await _countriesService.AddCountry(request);});
     }
 
     //When CountryName is duplicate, it should throw ArgumentException

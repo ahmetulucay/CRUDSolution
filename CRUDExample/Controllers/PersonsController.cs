@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CRUDExample.Filters.ActionFilters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Rotativa.AspNetCore;
 using ServiceContracts;
@@ -26,6 +27,7 @@ namespace CRUDExample.Controllers
         //Url: persons/index
         [Route("[action]")]
         [Route("/")]
+        [TypeFilter(typeof(PersonsListActionFilter))]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy =
             nameof(PersonResponse.PersonName), SortOrderOptions sortOrder = SortOrderOptions.ASC)
         {
@@ -93,7 +95,6 @@ namespace CRUDExample.Controllers
                 e.ErrorMessage).ToList();
                 return View();
             }
-
             //call the service method
             PersonResponse personResponse = await _personsService.AddPerson(personAddRequest);
 
@@ -103,7 +104,7 @@ namespace CRUDExample.Controllers
         }
 
         [HttpGet]
-        [Route("[action]/{personID}")] //Eg:  /persons/edit/1
+        [Route("[action]/{personID}")] //Eg:/persons/edit/1
         public async Task<IActionResult> Edit(Guid personID)
         {
             PersonResponse? personResponse = await _personsService.GetPersonByPersonID(personID);
@@ -180,6 +181,7 @@ namespace CRUDExample.Controllers
             await _personsService.DeletePerson(personUpdateResult.PersonID);
             return RedirectToAction("Index");
         }
+
         [Route("PersonsPDF")]
         public async Task<IActionResult> PersonsPDF()
         {
