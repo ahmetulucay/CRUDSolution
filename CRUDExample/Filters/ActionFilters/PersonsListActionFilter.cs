@@ -16,12 +16,30 @@ public class PersonsListActionFilter : IActionFilter
         //To do: add after logic here
         _logger.LogInformation("PersonsListActionFilter.OnActionExecuted method");
 
-        PersonsController persosController = (PersonsController)context.Controller;
+        PersonsController personsController = (PersonsController)context.Controller;
 
         IDictionary<string, object?>? parameters = (IDictionary<string, object?>) 
             context.HttpContext.Items["arguments"]; 
 
-        persosController.ViewData["searchBy"] = context.HttpContext.Items["arguments"];
+        if (parameters != null)
+        {
+            if (parameters.ContainsKey("searchBy"))
+            {
+                personsController.ViewData["searchBy"] = Convert.ToString(parameters["searchBy"]);
+            }
+            if (parameters.ContainsKey("searchString"))
+            {
+                personsController.ViewData["searchString"] = Convert.ToString(parameters["searchString"]);
+            }
+            if (parameters.ContainsKey("sortBy"))
+            {
+                personsController.ViewData["sortBy"] = Convert.ToString(parameters["sortBy"]);
+            }
+            if (parameters.ContainsKey("sortOrder"))
+            {
+                personsController.ViewData["sortOrder"] = Convert.ToString(parameters["sortOrder"]);
+            }
+        }
     }
 
     public void OnActionExecuting(ActionExecutingContext context)
