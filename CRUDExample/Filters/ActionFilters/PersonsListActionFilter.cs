@@ -25,19 +25,19 @@ public class PersonsListActionFilter : IActionFilter
         {
             if (parameters.ContainsKey("searchBy"))
             {
-                personsController.ViewData["searchBy"] = Convert.ToString(parameters["searchBy"]);
+                personsController.ViewData["CurrentSearchBy"] = Convert.ToString(parameters["searchBy"]);
             }
             if (parameters.ContainsKey("searchString"))
             {
-                personsController.ViewData["searchString"] = Convert.ToString(parameters["searchString"]);
+                personsController.ViewData["CurrentSearchString"] = Convert.ToString(parameters["searchString"]);
             }
             if (parameters.ContainsKey("sortBy"))
             {
-                personsController.ViewData["sortBy"] = Convert.ToString(parameters["sortBy"]);
+                personsController.ViewData["CurrentSortBy"] = Convert.ToString(parameters["sortBy"]);
             }
             if (parameters.ContainsKey("sortOrder"))
             {
-                personsController.ViewData["sortOrder"] = Convert.ToString(parameters["sortOrder"]);
+                personsController.ViewData["CurrentSortOrder"] = Convert.ToString(parameters["sortOrder"]);
             }
         }
     }
