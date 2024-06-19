@@ -40,6 +40,16 @@ public class PersonsListActionFilter : IActionFilter
                 personsController.ViewData["CurrentSortOrder"] = Convert.ToString(parameters["sortOrder"]);
             }
         }
+
+        personsController.ViewBag.SearchFields = new Dictionary<string, string>()
+            {
+                {nameof(PersonResponse.PersonName),"Person Name" },
+                {nameof(PersonResponse.Email),"Email" },
+                {nameof(PersonResponse.DateOfBirth),"Date of Birth" },
+                {nameof(PersonResponse.Gender),"Gender(M/F)" },
+                {nameof(PersonResponse.CountryID),"Country" },
+                {nameof(PersonResponse.Address),"Address" }
+            };
     }
 
     public void OnActionExecuting(ActionExecutingContext context)

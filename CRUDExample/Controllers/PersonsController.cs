@@ -37,15 +37,7 @@ namespace CRUDExample.Controllers
                 $"sortBy: {sortBy}, sortOrder: {sortOrder}");
 
             //Search
-            ViewBag.SearchFields = new Dictionary<string, string>()
-            {
-                {nameof(PersonResponse.PersonName),"Person Name" },
-                {nameof(PersonResponse.Email),"Email" },
-                {nameof(PersonResponse.DateOfBirth),"Date of Birth" },
-                {nameof(PersonResponse.Gender),"Gender(M/F)" },
-                {nameof(PersonResponse.CountryID),"Country" },
-                {nameof(PersonResponse.Address),"Address" }
-            };
+
             List<PersonResponse> persons = await _personsService.GetFilteredPersons(searchBy, searchString);
 
             //Sort
