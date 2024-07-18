@@ -46,8 +46,7 @@ namespace CRUDExample.Controllers
             return View(sortedPersons); //Views/Persons/Index.cshtml
         }
 
-        //Executes when the user clicks on "Create Person" hyperlink
-        //(while opening the create view)
+        //Executes when the user clicks on "Create Person" hyperlink (while opening the create view)
         //Url: persons/create
         [Route("[action]")]
         [HttpGet]
