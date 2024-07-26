@@ -28,6 +28,8 @@ namespace CRUDExample.Controllers
         [Route("[action]")]
         [Route("/")]
         [TypeFilter(typeof(PersonsListActionFilter))]
+        [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] 
+        { "X-Custom-Key", "Custom-Value"})]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy =
             nameof(PersonResponse.PersonName), SortOrderOptions sortOrder = SortOrderOptions.ASC)
         {
@@ -50,6 +52,8 @@ namespace CRUDExample.Controllers
         //Url: persons/create
         [Route("[action]")]
         [HttpGet]
+        [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[]
+        { "my-key", "my-value"})]
         public async Task<IActionResult> Create()
         {
             List<CountryResponse> countries = await _countriesService.GetAllCountries();
@@ -61,9 +65,9 @@ namespace CRUDExample.Controllers
             return View();
         }
 
+        [HttpPost]
         //Url: persons/create
         [Route("[action]")]
-        [HttpPost]
         public async Task<IActionResult> Create(PersonAddRequest personAddRequest)
         {
             if (!ModelState.IsValid)
