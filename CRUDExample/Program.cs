@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 using Repositories;
 using Serilog;
+using CRUDExample.Filters.ActionFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,13 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services,
         ReadFrom.Services(services);
     });
 
-builder.Services.AddControllersWithViews();
+//it adds controllers and views as services
+builder.Services.AddControllersWithViews(options =>
+{
+    //options.Filters.Add<ResponseHeaderActionFilter>();
+    var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<ResponseHeaderActionFilter>>();
+    options.Filters.Add(new ResponseHeaderActionFilter(logger, "My-Key-From-Global", "My-Value-From-Global"));
+});
 
 //add services into IoC Container
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
