@@ -9,6 +9,8 @@ using ServiceContracts.Enums;
 namespace CRUDExample.Controllers
 {
     [Route("[controller]")]
+    [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[]
+        { "My-Key-From-Controller", "My-Value-From-Controller"}, Order = 2)]
     public class PersonsController : Controller
     {
         //private fields
@@ -29,7 +31,7 @@ namespace CRUDExample.Controllers
         [Route("/")]
         [TypeFilter(typeof(PersonsListActionFilter))]
         [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] 
-        { "X-Custom-Key", "Custom-Value"})]
+        { "My-Key-From-Action", "My-Value-From-Action"}, Order = 1)]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy =
             nameof(PersonResponse.PersonName), SortOrderOptions sortOrder = SortOrderOptions.ASC)
         {
